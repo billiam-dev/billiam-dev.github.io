@@ -46,10 +46,10 @@
                             <h1>Summary</h1>
                             <p1>
                                 Walls that Watch is a challenging retro-horror game about escaping an enormous underground labyrinth filled with strange monsters.
-                                It took 14 months to develop, including levels, enemies, UI, models, textures and sounds effects, as well as writting the world and story of the game.
+                                It took 14 months to develop, including levels, enemies, UI, models, textures and sounds effects, as well as writing the world and story of the game.
                             </p1>
                             <p>
-                                Since its release it has been played and recommended by several YouTubers and Steam curators and recieved very possitive reviews.
+                                Since its release it has been played and recommended by several YouTubers and Steam curators and received very positive reviews.
                             </p1>
                         </div>
                         <div class="column is-one-half">
@@ -61,15 +61,15 @@
                             <h1>Development</h1>
                             <h2>Programming</h2>
                             <p1>
-                                I intentionally designed Walls that Watch with a limitted in scope in mind, so that I could finish it relatively quickly. As such, I avoided any requirements of large, bespoke systems.
+                                I intentionally designed Walls that Watch with a limited in scope in mind, so that I could finish it relatively quickly. As such, I avoided any requirements of large, bespoke systems.
                                 The most challenging aspect of programming the game was bound to be the variety of diverse enemies, each with entirely different behaviours, visual elements and means of travel.
                                 For enemies that needed to physically traverse the world, I used Unity's NavMesh system.
                                 This involved figuring out how to partition the space so that some enemies avoid certain paths, such as those that intersect a light source or pool of water.
                                 <br><br>
-                                To handle enemy behaviours, I used a multi-layerd state maching.
-                                This manifested as a framework were each enemy inheritted from a base class which contained their current behaviour.
+                                To handle enemy behaviours, I used a multi-layered state machine.
+                                This manifested as a framework were each enemy inherited from a base class which contained their current behaviour.
                                 This is an object which instructs the enemy on how to move, damage the player and when to switch behaviours using functions from the base class.
-                                it knows which of these options to perform because most of the enemy behaviours contatin a sub-state.
+                                it knows which of these options to perform because most of the enemy behaviours contain a sub-state.
                                 For example, a simple roaming behaviour might look like this:
                                 <div class="columns">
                                     <div class="column">
@@ -160,8 +160,8 @@
                                 Most of the level behaviours are controlled by a system of triggers.
                                 At the beginning of each level, a trigger fires to check whether the challenge mode is enabled and, if it is, the environment is modified and the correct exit trigger is selected.
 
-                                I later reformed this idea into a single EventTrigger component which contails a list of conditions and outputs.
-                                These elements are user-defined by inheriting from the coresponding base class, at which point all children are found using reflection and made available to the GUI.
+                                I later reformed this idea into a single EventTrigger component which contains a list of conditions and outputs.
+                                These elements are user-defined by inheriting from the corresponding base class, at which point all children are found using reflection and made available to the GUI.
                                 Then they can be added to an EventTrigger in the scene.
                             </p1>
                         </div>
@@ -173,7 +173,7 @@
                                 One of the greatest challenges I faced when developing WtW was spending hours of time slamming my head against the Blender default cube waiting for it to turn into art.
                                 3D modelling is a steep learning curve, especially for someone who isn't an artist. As such, the early models I produced for the game were extremely rudimentary and took a long time to make.
                                 Level assets needed to be modular and reusable, while enemies needed to have rigs so they could move.
-                                Luckily, there exists an artstyle where this jankyness is a feature, not a bug and I picked that one.
+                                Luckily, there exists an art-style where this jankyness is a feature, not a bug and I picked that one.
                                 <br><br>
                                 Through making WtW, I was able to develop my 3D modelling skills and have since began using the low-poly / high-poly workflow in my newer models, and texturing them in Substance Painter.
                                 With these skills I released a post-launch update to polish many of the older models, though I still held to the game's their retro aesthetic.
