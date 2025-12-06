@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="shortcut icon" href="..\\assets/billiam_logo.png">
+        <link rel="apple-touch-icon" href="..\\assets/billiam_logo.png">
+        <link rel="stylesheet" href="..\\assets/style.css">
+        <link rel="stylesheet" href="assets/highlight/atom-one-dark.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+        <script src="..\\assets/highlight/highlight.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script>history.scrollRestoration = "manual"</script>
+        <title>Billiam | Rogue Roles</title>
+    </head>
+    <body>
+        <nav class="navbar" id="navbar">
+            <div class="navbar-items">
+                <img class="navbar-logo" src="..\\assets/billiam_logo_full.png">
+            </div>
+            <div class="navbar-items">
+                <a class="navbar-item" href="..\\index.html#home">Home</a>
+                <a class="navbar-item" href="..\\index.html#about">About</a>
+                <a class="navbar-item" href="..\\index.html#showcase">Projects</a>
+            </div>
+            <div class="navbar-items aligned-right">
+                <a class="navbar-item" target="_blank" rel="noopener noreferrer" href="https://github.com/billiam-dev">
+                    <img class="navbar-image enlarge-on-hover" src="..\\assets/github_icon_white.png" alt="Github">
+                </a>
+                <a class="navbar-item" target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/william-barber-9a0841278/">
+                    <img class="navbar-image enlarge-on-hover" src="..\\assets/linkedin_icon_white.png" alt="LinkedIn">
+                </a>
+                <a class="navbar-item" target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/@BilliamDev">
+                    <img class="navbar-image enlarge-on-hover" src="..\\assets/youtube_icon_white.png" alt="Youtube">
+                </a>
+            </div>
+        </nav>
+        <section class="hero is-fullheight has-gradient-background below-navbar">
+            <div class="hero-body">
+                <div class="container has-gray-background has-drop-shadow has-border">
+                    <video class="has-border" src="..\\assets/projects/rogue-roles/demo.mov" autoplay muted playsinline loop></video>
+                    <div class="container">
+                        <div class="columns">
+                            <div class="column">
+                                <p1>
+                                    Rogue Roles was my submission to the 2023 GMTK Game Jam, a two day game making marathon where you are tasked with producing a game that fits the theme 'Roles Reversed'.
+                                    I decided to build a top-down arena shooter roguelike, where the enemies and props in the dungeon constantly swapped roles with each other.
+                                    So one moment you could be chasing down a treasure chest for coins, and the next it could be gunning for you and the skeleton enemies now contain those precious coins.
+                                    <br><br>
+                                    I found a pixel art <a href="https://0x72.itch.io/dungeontileset-ii">dungeon asset pack</a> by 0x72 and used <a href="https://sfxr.me/">JSFXR</a> for sound effects, leaving me to implement the complex, constantly swapping behaviour of the various enemies and objects.
+                                    <br><br>
+                                    Before implementing any gameplay ideas, I always consider "how might this lead to interesting gameplay".
+                                    I did not want to have objects simply swap behaviours entirely, since this limits the amount of unique functionality that can arise from the idea.
+                                    I decided I wanted objects to retain their basic function, even when swapped...
+                                    <br>
+                                    So, skeletons always chase the player and skulls always try to create distance for their ranged attacks.
+                                    To implement this, I gave each object a fixed primary function and then a secondary function which is generic, and can be applied to any object.
+                                    This led to the interesting scenarios I was after, where all of a sudden you would have to dodge a hoard of skeletons to get to the skulls behind, which now acted as coins.
+                                    Or, you could decimate a pack of skeletons because their function was swapped with chests.
+                                    Or, worst of all, coins would suddenly become ruthless explosives chaisng you down meaning you should stop shooting enemies until they swap back.
+                                    <br><br>
+                                    Once this was working, I threw together a shop with basic upgrades, a menu and a bestiary to explain what each object does.
+                                    The final result is very difficult and could definitely have done with a balance pass, but I was happy to see that it received positive feedback and placed fairly highly.
+                                </p1>
+                            </div>
+                            <div class="column is-one-third">
+                                <figure class="image">
+                                    <img class="has-border" src="..\\assets/projects/rogue-roles/banner.png">
+                                    <figcaption>Play <a href="https://billidev.itch.io/rogue-roles">here</a>!</figcaption>
+                                </figure>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <footer id="footer">
+        </footer>
+    </body>
+</html>

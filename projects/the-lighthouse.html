@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="shortcut icon" href="..\\assets/billiam_logo.png">
+        <link rel="apple-touch-icon" href="..\\assets/billiam_logo.png">
+        <link rel="stylesheet" href="..\\assets/style.css">
+        <link rel="stylesheet" href="..\\assets/highlight/atom-one-dark.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+        <script src="..\\assets/highlight/highlight.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script>history.scrollRestoration = "manual"</script>
+        <title>Billiam | The Lighthouse</title>
+    </head>
+    <body>
+        <nav class="navbar" id="navbar">
+            <div class="navbar-items">
+                <img class="navbar-logo" src="..\\assets/billiam_logo_full.png">
+            </div>
+            <div class="navbar-items">
+                <a class="navbar-item" href="..\\index.html#home">Home</a>
+                <a class="navbar-item" href="..\\index.html#about">About</a>
+                <a class="navbar-item" href="..\\index.html#showcase">Projects</a>
+            </div>
+            <div class="navbar-items aligned-right">
+                <a class="navbar-item" target="_blank" rel="noopener noreferrer" href="https://github.com/billiam-dev">
+                    <img class="navbar-image enlarge-on-hover" src="..\\assets/github_icon_white.png" alt="Github">
+                </a>
+                <a class="navbar-item" target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/william-barber-9a0841278/">
+                    <img class="navbar-image enlarge-on-hover" src="..\\assets/linkedin_icon_white.png" alt="LinkedIn">
+                </a>
+                <a class="navbar-item" target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/@BilliamDev">
+                    <img class="navbar-image enlarge-on-hover" src="..\\assets/youtube_icon_white.png" alt="Youtube">
+                </a>
+            </div>
+        </nav>
+        <section class="hero is-fullheight has-gradient-background below-navbar">
+            <div class="hero-body">
+                <div class="container has-gray-background has-drop-shadow has-border">
+                    <img class="has-border" src="..\\assets/projects/the-lighthouse/banner.png">
+                    <div class="container">
+                        <div class="columns">
+                            <div class="column">
+                                <p1>
+                                    The Lighthouse is a brief retro-horror game, about rowing to a mysterious lighthouse in an old rowboat.
+                                    <br>
+                                    I decided to try the High Definition Render Pipeline in Unity, which gave me access to volumetric lighting and fog.
+                                    These effects look great, even when the image is downsampled and dithered, as I was going for a mix of PS1 graphics with modern lighting.
+                                </p1>
+                            </div>
+                            <div class="column is-one-third">
+                                <figure class="image">
+                                    <img class="has-border" src="..\\assets/projects/the-lighthouse/screenshot-1.png">
+                                    <figcaption>Play the game <a href="https://billidev.itch.io/lake-game">here</a>!</figcaption>
+                                </figure>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container">
+                        <h2>Ocean</h2>
+                        <p1>
+                            The most challenging element of The Lighthouse was building the ocean shader and buoyancy simulation.
+                            The buoyancy had to match the visual position of the waves, but that vertex displacement takes place on the GPU, while buoyancy is on the CPU.
+                            I started by making an ocean shader in Unity's Shader Graph.
+                            The waves were created by layering Gerstner waves and sampling them over a pre-made plane mesh, which was increasingly detailed nearer the centre.
+                            The first option to obtain the wave height is a GPU readback, but I've heard these are not recommended due to speed limitations.
+                            So, I elected to simply calculate the wave displacement for requested positions on the CPU as well.
+                            <br><br>
+                            This is the Gerstner wave shader...
+                        </p1>
+                        <div class="columns">
+                            <div class="column">
+                                <figure>
+                                    <img class="has-border" src="..\\assets/projects/the-lighthouse/gerstner-wave-shader-graph.png">
+                                    <figcaption>Gerster Wave Shader Graph</figcaption>
+                                </figure>
+                            </div>
+                            <div class="column is-one-third">
+                                <figure>
+                                    <img class="has-border" src="..\\assets/projects/the-lighthouse/gerstner-wave-theta-shader-graph.png">
+                                    <figcaption>Theta</figcaption>
+                                </figure>
+                                <figure>
+                                    <img class="has-border" src="..\\assets/projects/the-lighthouse/gerstner-wave-frequency-shader-graph.png">
+                                    <figcaption>Frequency</figcaption>
+                                </figure>
+                            </div>
+                        </div>
+                        <p1>
+                            ...and the equivalent C#.
+                        </p1>
+                        <pre><code class="has-border">Vector3 GerstnerDisplacement(Vector3 pos, Vector3 direction, float amplitude, float phase, float timescale, float offset, float gravity, float depth)
+{
+    float period = offset * timescale;
+    float theta = Theta(pos, direction, amplitude, phase, period, gravity, depth);
+
+    // X
+    float a = direction.x / direction.magnitude;
+    float b = amplitude / HyperbolicTangent(direction.magnitude * depth);
+    float x = -1f * (Mathf.Sin(theta) * a * b);
+
+    // Y
+    float y = Mathf.Cos(theta) * amplitude;
+
+    // Z
+    float j = direction.z / direction.magnitude;
+    float z = -1f * (Mathf.Sin(theta) * j * b);
+
+    return new Vector3(x, y, z);
+}
+
+float Theta(Vector3 pos, Vector3 direction, float amplitude, float phase, float offset, float gravity, float depth)
+{
+    float frequency = Frequency(direction.x, gravity, depth);
+
+    float a = (direction.x * pos.x) + (direction.z * pos.z);
+    float b = frequency * offset;
+
+    return (a - b) - phase;
+}
+
+float Frequency(float length, float gravity, float depth)
+{
+    float a = gravity * length;
+    float b = HyperbolicTangent(length * depth);
+
+    return Mathf.Sqrt(a * b);
+}
+
+float HyperbolicTangent(double a)
+{
+    return (float)System.Math.Tanh(a);
+}</code></pre>
+                        <p1>
+                            For each buoyant object, we work out the distance under the wave height every phyisics tick and then apply an upwards force proportional to that distance.
+                            Note that because Gerster waves displace horizontally as well as vertically, the y component of the displacement vector is not perfectly accurate to the provided x and y position.
+                            In my case this was not noticeable in the final product, however you can attain a more accurate result by subtracting the x and z offsets from the original position and then doing the Gerstner computation again.
+                            Somewhere around four itteration of this gives a very accurate aproximation.
+                        </p1>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <footer id="footer">
+        </footer>
+    </body>
+</html>

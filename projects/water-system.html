@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="shortcut icon" href="..\\assets/billiam_logo.png">
+        <link rel="apple-touch-icon" href="..\\assets/billiam_logo.png">
+        <link rel="stylesheet" href="..\\assets/style.css">
+        <link rel="stylesheet" href="..\\assets/highlight/atom-one-dark.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+        <script src="..\\assets/highlight/highlight.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script>history.scrollRestoration = "manual"</script>
+        <title>Billiam | Water System</title>
+    </head>
+    <body>
+        <nav class="navbar" id="navbar">
+            <div class="navbar-items">
+                <img class="navbar-logo" src="..\\assets/billiam_logo_full.png">
+            </div>
+            <div class="navbar-items">
+                <a class="navbar-item" href="..\\index.html#home">Home</a>
+                <a class="navbar-item" href="..\\index.html#about">About</a>
+                <a class="navbar-item" href="..\\index.html#showcase">Projects</a>
+            </div>
+            <div class="navbar-items aligned-right">
+                <a class="navbar-item" target="_blank" rel="noopener noreferrer" href="https://github.com/billiam-dev">
+                    <img class="navbar-image enlarge-on-hover" src="..\\assets/github_icon_white.png" alt="Github">
+                </a>
+                <a class="navbar-item" target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/william-barber-9a0841278/">
+                    <img class="navbar-image enlarge-on-hover" src="..\\assets/linkedin_icon_white.png" alt="LinkedIn">
+                </a>
+                <a class="navbar-item" target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/@BilliamDev">
+                    <img class="navbar-image enlarge-on-hover" src="..\\assets/youtube_icon_white.png" alt="Youtube">
+                </a>
+            </div>
+        </nav>
+        <section class="hero is-fullheight has-gradient-background below-navbar">
+            <div class="hero-body">
+                <div class="container has-gray-background has-drop-shadow has-border">
+                    <div class="container">
+                        <h2>Abstract</h2>
+                        <p1>
+                            This is a (very) brief overview of my Water System for Unity, explaining how I made the Water System for my upcoming game Abyssal.
+                            As it turns out, building a convincing ocean system is an extremely complicated task, especially for someone who had never used hlsl, nor even heard of a compute shader.
+                            By far the most daunting task for me was working out where to even start with each individual component in the system.
+                            And that's not to say there aren't several more features that could be implemented.
+                            <br>
+                            If by chance you are reading this and looking to build your own water system, I've linked a bunch of resources which helped me with mine.
+                            <br>
+                            Also note that my implementation is still under development and some aspects are bound to change.
+                        </p1>
+                        <h2>Sections</h2>
+                        <ul>
+                            <li>
+                                <a class="hide-link" href="#setup">Setup</a>
+                            </li>
+                            <li>
+                                <a class="hide-link" href="#wave-displacement">Wave Displacement</a>
+                            </li>
+                            <li>
+                                <a class="hide-link" href="#water-shading">Water Shading</a>
+                            </li>
+                            <li>
+                                <a class="hide-link" href="#dynamic-detail">Dynamic Detail</a>
+                            </li>
+                            <li>
+                                <a class="hide-link" href="#underwater">Underwater Rendering</a>
+                            </li>
+                            <li>
+                                <a class="hide-link" href="#caustics">Caustics</a>
+                            </li>
+                            <li>
+                                <a class="hide-link" href="#godrays">Godrays</a>
+                            </li>
+                            <li>
+                                <a class="hide-link" href="#cutouts">Water Cutouts</a>
+                            </li>
+                            <li>
+                                <a class="hide-link" href="#sources">Sources</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="container">
+                        <a class="anchor" id="setup"></a>
+                        <h2>Setup</h2>
+                        <p1>
+                            Entering this project, I had previously made water effects using a subdivided plane and Unity's shader graph producing an acceptable but mediocre result.
+                            For this project, however, I wanted to know how water is handled in games like Sea of Theives and Subnautica, and how to integrate it in a clean and usable manor into Unity.
+                            So what better place to look than Unity's own water system for the High Definition Render Pipeline?
+                            <br><br>
+                            Though I was building my water system for the Universal Render Pipeline (which would create an extra challenge later), HDRP is the best example of how Unity themselves would approach this problem.
+                            HDRP simplifies creating and managing oceans by having just one 'WaterSurface' component, which tells the backend to render the surface, caustics and underwater effects.
+                            This avoids the need for mesh renderers, renderer features or extra components spreading the functionality of the water over several objects and assets.
+                            Taking a peak at the source code, we see that HDRP updates and renders it's water by utilizing command buffers.
+                            <br><br>
+                            Command buffers are essentially a sequence of rendering instructions that you create and then send to the GPU.
+                            Then, they can be executed again and again without having to reconstruct and send the buffer, among other performance benefits.
+                            <br>
+                            We can hook into URP's per-camera rendering callback like so:
+                            <pre><code class="has-border">RenderPipelineManager.beginCameraRendering += RenderSurface;</code></pre>
+                            And fetch a command buffer using CommandBufferPool.Get():
+                            <pre><code class="has-border">void RenderSurface(ScriptableRenderContext context, Camera camera)
+{
+    CommandBuffer commandBuffer = CommandBufferPool.Get("Water CMD");
+    
+    UpdateSurface(waterSurface, commandBuffer, context, camera);
+    
+    context.ExecuteCommandBuffer(commandBuffer);
+    context.Submit();
+
+    commandBuffer.Clear();
+    CommandBufferPool.Release(commandBuffer);
+}</code></pre>
+                            The UpdateSurface() method is where I queue the necessary compute shaders and Scriptable Render Passes, as discussed later.
+                        </p1>
+                    </div>
+                    <div class="container">
+                        <a class="anchor" id="wave-displacement"></a>
+                        <h2>Wave Displacement</h2>
+                        <p1>
+                            In my previous water shader mentioned above, I displaced the ocean vertices using the sum of four <a href="https://en.wikipedia.org/wiki/Trochoidal_wave">Gerstner Waves</a>, each with different amplitudes, frequencies and wavelengths.
+                            While this looked acceptable over small areas, observing the water from above or below gives immediatly shows noticeable repeating, or tiling, patterns.
+                            The obvious solution is to jsut add more waves, but modern PC's begin to struggle at even 64 Gerstner waves.
+                            To mimic real oceans, we need to simulate literal millions of waves at once.
+                            To do this, we can use the <i>Fast Fourier Transform</i>, the tech behind popular games such as Sea of Theives and Subnautica's ocean and the results speak for themselves...
+                        </p1>
+                        <figure>
+                            <img class="has-border" src="..\\assets/projects/water-system/sea_of_thieves_ocean.webp">
+                            <figcaption>Sea of Thieves Ocean</figcaption>
+                        </figure>
+                        <p>
+                            The thesis of the Fourier Transform is that any given waveform can be represented as a sum of sinusoids, a fancy word which means basic sine and cosine waves.
+                            The purpose of Fourier Transform then, is to take a periodic waveform and decompose it into a sum of sinusoids that, depending on how many waves you want, very closesly matches it.
+                            <br>
+                            See: <a href="https://www.thefouriertransform.com/#introduction">https://www.thefouriertransform.com/#introduction</a>
+                            <br><br>
+                            The output of the Fourier Transform can be considered as a wave graph in the frequency domain which, as opposed to describing how amplitude of a wave changes over time, describes how the amplitude of a wave changes with a range of frequencies.
+                            <br>
+                            For example, the frequency of these waves is ~30hz, so we see a spike at ~30hz in the frequency domain. The spike in the second graph is higher, to reflect the wave's increased amplitude.
+                            <figure class="image small">
+                                <img src="..\\assets/projects/water-system/time_domain_vs_frequency_domain.ppm">
+                                <figcaption>Time domain vs frequency domain, see: <a href="https://www.researchgate.net/figure/Time-domain-graph-and-frequency-domain-graph-Take-034-013-When-there-is-only_fig1_342559582">here</a></figcaption>
+                            </figure>
+                            The neat part is, the Fourier Transform can perform this in reverse too, known as the Inverse Fourier Transform.
+                            So, for a constantly progressing frequency spectrum, we shall perform the Inverse Fourier Transform over a set of discrete points to obtain usable displacement and slope values which can be applied in an ocean shader.
+                        </p>
+                        <div class="columns">
+                            <div class="column">
+                                <figure class="image tiny">
+                                    <img src="..\\assets/projects/water-system/wave_displacement.gif">
+                                    <figcaption>Displacement Map</figcaption>
+                                </figure>
+                            </div>
+                            <div class="column">
+                                <figure class="image tiny">
+                                <img src="..\\assets/projects/water-system/wave_slope.gif">
+                                    <figcaption>Slope Map</figcaption>
+                                </figure>
+                            </div>
+                        </div>
+                        <p>
+                            A basic implementation of this algorithm is known as the Discrete Fourier Transform, but this alone does not meet the performance requirements of real-time games, which is why we use the Fast Fourier Transform.
+                            This uses an algorithm knows as the 'Butterfly Algorithm' to recursively split the data in half avoiding unnecessary calculations.
+                            See <a href="https://antoniospg.github.io/UnityOcean/OceanSimulation.html">the section on FFT</a> for more details.
+                            <br>
+                            With this frankly insane performance, we can compute several unique wave spectrums simultaneously and tile them over the ocean.
+                            This practically eliminates tiling by stretching it over a truly colossal area:
+                            <img class="has-border" src="..\\assets/projects/water-system/ocean_sunset.png">
+                            TEMP!!
+                        </p>
+                    </div>
+                    <div class="container">
+                        <a class="anchor" id="water-shading"></a>
+                        <h2>Water Shading</h2>
+                        <p1>
+
+                        </p1>
+                    </div>
+                    <div class="container">
+                        <a class="anchor" id="dynamic-detail"></a>
+                        <h2>Dynamic Detail</h2>
+                        <p1>
+                            *Pictures above should show non-infinite centre mesh.<br>
+                            Now we have a decent looking water surface, we need to turn it into an unending ocean.
+                            However, simply tiling these grid meshes quickly explodes the vertex count. We could decrease the resolution of the grid mesh but now the waves are jagged, as there is not enough vertices to accurately reflect the water surface.
+                            To solve this problem, we must reduce the detail of the mesh as it gets further from the camera, where the pixels on your screen cannot depict the detail anyway.
+                            To achieve this, I used two techniques:
+                            <ul>
+                                <li>Dynamic Meshing</li>
+                                <li>Vertex Tessellation</li>
+                            </ul>
+                        </p1>
+                        <p>
+
+                        </p>
+                        <p>
+                            Vertex Tessellation takes place inside the water surface shader, specifically in the Hull and Domain stages.
+                            It allows us to recursively subdivide the triangles of our mesh, giving the vertex displacement more geometry to work with while not increasing the number of vertices sent to the GPU.
+                            <br>
+                            TODO: EXAMPLE GIF!
+                            <br>
+                            Tessellation shaders can uniformly subdivide an entire mesh, or dynamically subdivide it.
+                            For this project, I increase the tessellation as we draw closer to the camera.
+                            In this stage I also skip rendering triangles that are outside the camera's view planes, a practice known as frustum culling.
+                            <br><br>
+                            Utilizing both these methods means water near the camera can be depicted with very high detail, while keeping the total vertex count at a managable 10 000 verts.
+                        </p>
+                    </div>
+                    <div class="container">
+                        <a class="anchor" id="underwater"></a>
+                        <h2>Underwater Rendering</h2>
+                        <p1>
+                            Did not have transparent depth prepass, so I had to do my own. Red/green face rendering etc...
+                        </p1>
+                    </div>
+                    <div class="container">
+                        <a class="anchor" id="caustics"></a>
+                        <h2 id="caustics">Caustics</h2>
+                        <p1>
+                            'Caustics' refer to the patterns of light created when millions of light rays move from one medium to another.
+                            As it does so, the light refracts - or bends - resulting in areas of high light density and low light density.
+                            <br><br>
+                            Many games create the appearance of caustics by simply mapping an animated texture to underwater geometry.
+                            And for many games this is by far the best and easiest solution, especially those where the surface waves do not vastly change or performance is a large concern.
+                            However, I want my caustic patterns to be able to reflect a calm and slow ocean surface or to a violent and stormy one and anyway in-between.
+                            <br><br>
+                            <a href="https://medium.com/@evanwallace/rendering-realtime-caustics-in-webgl-2a99a29a0b2c">This</a> article describes how caustic textures can be generated by refracting the vertices of a dense plane mesh, and then intersecting them against a virtual plane.
+                            The color of the frag shader is then the difference in area between the non-refracted plane, and the refracted one.
+                            In Unity that looks like this:
+                        </p1>
+                            <pre><code class="has-border">float Frag (Varyings i) : SV_Target
+{
+    float intialTriangleArea = length(ddx(i.originalPos)) * length(ddy(i.originalPos));
+    float refractedTriangleArea = length(ddx(i.refractedPos)) * length(ddy(i.refractedPos));
+
+    return intialTriangleArea / refractedTriangleArea;
+}</code></pre>
+                        <p1>
+                            And here is the texture produced:
+                        </p1>
+                        <figure class="image tiny">
+                            <img src="..\\assets/projects/water-system/caustics.gif">
+                            <figcaption>Caustics Texture</figcaption>
+                        </figure>
+                        <p1>
+                            Due to the periodic nature of the FFT, we can produce a caustics texture that is seamlessly tileable across the environment.
+                            In my case I used triplanar mapping.
+                            <br>
+                            Note that the virtual caustics plane does produce a lot of vertices when generated at a high resolution so, for me, finding the right balance of performance and detail was critical.
+                        </p1>
+                    </div>
+                    <div class="container">
+                        <a class="anchor" id="godrays"></a>
+                        <h2>Godrays</h2>
+                        <p1>
+                            Godrays, or crepuscular rays, occur when light penetrates the water surface and is scattered outward, some of which hits the player camera.
+                            We can achieve this effect by utilizing the caustics texture we just computed, but rather than mapping it to the scene, we raymarch the texture as projected by the light source:
+                        </p1>
+                            <pre><code class="has-border">float SampleGodrays(float3 positionWS, float3 lightDirection)
+{
+    float3 normal = float3(0.0, -1.0, 0.0);
+
+    // Project caustics texture in light direction.
+    float3 forward = refract(lightDirection, normal, 1.0 / IndexOfRefraction);
+    float3 tangent = normalize(cross(forward, float3(0.0, 1.0, 0.0)));
+    float3 bitangent = cross(tangent, forward);
+
+    float3 sampleCoord = positionWS * _TilingFactor;
+    float2 uv = float2(dot(sampleCoord, tangent), dot(sampleCoord, bitangent)) * 0.5 + 0.5;
+
+    // Sample caustics texture at a low LOD of for some free blurring.
+    // This means we can get away with a larger step size by blurring away the artefacts created.
+    return SAMPLE_TEXTURE2D_LOD(_CausticsTexture, sampler_CausticsTexture, uv, 5).r;
+}</code></pre>
+                        <p1>
+                            This function is called from a ray-marching shader, including upsampling and Gausian blur, before being composited into the final image.
+                        </p1>
+                        <figure>
+                            <img class="has-border" src="..\\assets/projects/water-system/caustics-screenshot.png">
+                        </figure>
+                    </div>
+                    <div class="container">
+                        <a class="anchor" id="cutouts"></a>
+                        <h2>Water Cutouts</h2>
+                        <p1>
+                            Ok, almost done, it is finally time to put a submarine in it.
+                            To achieve this, we need some way to cull the water surface - and the volumetric effects - inside of our vessel.
+                            My first idea was to render the hull of the submarine mesh using a shader that writes to the stencil buffer. Then, the surface simply skips rendering if the stencil value was written to.
+                            However, while this works well for opaque surfaces, like the hull of the rowing boat in my previous ocean project, it struggles with transparent surfaces like the great glass window at the front of a submarine.
+                            Handling the cutouts in screen-space was incapable of partially culling world-space volumetric effects like the godrays or solving complex cases like having multiple cutouts in a line.
+                            <br>
+                            We somehow need to know for any given point in world-space, if we are inside a cutout or not?
+                            Enter Signed Distance Functions.
+                            <br>
+                            <br>
+                            Signed Distance Functions, or SDF's, are kind of magical.
+                            They essentially allow you to work out how far a point is from the surface of a shape, where negative values are inside the shape and positive are outside.
+                            I talk more about SDF's in my Terrain Generation project but, for my water cutouts, I needed an SDF which matched the shape of the submarine's hull.
+                            To achieve this, I wrote a custom SDF generator which could take a mesh and output a 3D texture where the red channel contains the distance from the surface.
+                            This means that for every point in the 3D texture, we must evaluate the distance to every triangle in the mesh and store the value closest to zero.
+                            <br>
+                            The function for that looks like this:
+                        </p1>
+                        <pre><code class="has-border">float EvaluateTriangle(int triangleIndex, float3 pos)
+{
+    // a, b and c are the vertices of the triangle.
+    float3 a = _Vertices[_Triangles[0 + triangleIndex * 3]];
+    float3 b = _Vertices[_Triangles[1 + triangleIndex * 3]];
+    float3 c = _Vertices[_Triangles[2 + triangleIndex * 3]];
+
+    float3 pointOnTriangle = ClosestPointOnTriangle(pos, a, b, c);
+    float3 normal = cross(b - a, c - a);
+    
+    float3 v = pos - pointOnTriangle;
+    float3 dirToFace = normalize(v);
+    float distToFace = length(v);
+
+    if (dot(dirToFace, normal) < 0)
+    {
+        distToFace *= -1;
+    }
+
+    return distToFace;
+}
+
+float SmallestPointDistanceToMesh(float3 pos)
+{
+    float minAbsoluteDistance = 3.40282347e+38F;
+    float minDistance = 3.40282347e+38F;
+
+    for (int i = 0; i < _NumTriangles; i++)
+    {
+        float distance = EvaluateTriangle(i, pos);
+        float absoluteDistance = abs(distance);
+
+        if (absoluteDistance < minAbsoluteDistance)
+        {
+            minAbsoluteDistance = absoluteDistance;
+            minDistance = distance;
+        }
+    }
+
+    return minDistance;
+}</code></pre>
+                    <p>
+                    The function I used to find the closest point on a triangle is from the <a href="https://github.com/RenderKit/embree/blob/master/tutorials/common/math/closest_point.h">Embree Ray Tracing Repo</a>.
+                    <br>
+                    <br>
+                    These SDF's can then be given to the shader as a sort of dictionary, along with an ID and matrix the submarines in the scene creating several precise cutouts.
+                    <br>
+                    As an aside, sampling 3D textures can get rather expensive, so I also implemented a bounding box check which has to pass first before we sample the texture.
+                    This along with frustum culling and a capped render distance makes the performance hit much more managable.
+                    </p>
+                    </div>
+                    <div class="container">
+                        <a class="anchor" id="sources"></a>
+                        <h2>Sources</h2>
+
+                        <p>The Fourier Transform</p>
+                        <figcaption class="reference">
+                            <a href="https://www.thefouriertransform.com/">https://www.thefouriertransform.com/</a>
+                        </figcaption>
+
+                        <p>Physically based Water Shading</p>
+                        <figcaption class="reference">
+                            <a href="https://www.scratchapixel.com/lessons/3d-basic-rendering/introduction-to-shading/reflection-refraction-fresnel.html">https://www.scratchapixel.com/lessons/3d-basic-rendering/introduction-to-shading/reflection-refraction-fresnel.html</a>
+                        </figcaption>
+
+                        <p>I Tried Simulating The Entire Ocean - Acerola</p>
+                        <figcaption class="reference">
+                            <a href="https://www.youtube.com/watch?v=yPfagLeUa7k">https://www.youtube.com/watch?v=yPfagLeUa7k</a>
+                        </figcaption>
+
+                        <p>Ocean Simulation - antoniospg</p>
+                        <figcaption class="reference">
+                            <a href="https://antoniospg.github.io/UnityOcean/OceanSimulation.html">https://antoniospg.github.io/UnityOcean/OceanSimulation.html</a>
+                        </figcaption>
+
+                        <p>Simulating Ocean Water - Jerry Tessendorf</p>
+                        <figcaption class="reference">
+                            <a href="https://people.computing.clemson.edu/~jtessen/reports/papers_files/coursenotes2004.pdf">https://people.computing.clemson.edu/~jtessen/reports/papers_files/coursenotes2004.pdf</a>
+                        </figcaption>
+
+                        <p>Rendering Realtime Caustics in WebGL - Even Wallace</p>
+                        <figcaption class="reference">
+                            <a href="https://medium.com/@evanwallace/rendering-realtime-caustics-in-webgl-2a99a29a0b2c">https://medium.com/@evanwallace/rendering-realtime-caustics-in-webgl-2a99a29a0b2c</a>
+                        </figcaption>
+
+                        <p>Periodic Caustic Textures</p>
+                        <figcaption class="reference">
+                            <a href="https://www.dgp.toronto.edu/public_user/stam/reality/Research/PeriodicCaustics/index.html">https://www.dgp.toronto.edu/public_user/stam/reality/Research/PeriodicCaustics/index.html</a>
+                        </figcaption>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </section>
+        <footer id="footer">
+        </footer>
+    </body>
+</html>

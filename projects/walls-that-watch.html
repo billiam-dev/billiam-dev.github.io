@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="shortcut icon" href="..\\assets/billiam_logo.png">
+        <link rel="apple-touch-icon" href="..\\assets/billiam_logo.png">
+        <link rel="stylesheet" href="..\\assets/style.css">
+        <link rel="stylesheet" href="..\\assets/highlight/atom-one-dark.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+        <script src="..\\assets/highlight/highlight.js"></script>
+        <script>hljs.highlightAll();</script>
+        <script>history.scrollRestoration = "manual"</script>
+        <title>Billiam | Walls that Watch</title>
+    </head>
+    <body>
+        <nav class="navbar" id="navbar">
+            <div class="navbar-items">
+                <img class="navbar-logo" src="..\\assets/billiam_logo_full.png">
+            </div>
+            <div class="navbar-items">
+                <a class="navbar-item" href="..\\index.html#home">Home</a>
+                <a class="navbar-item" href="..\\index.html#about">About</a>
+                <a class="navbar-item" href="..\\index.html#showcase">Projects</a>
+            </div>
+            <div class="navbar-items aligned-right">
+                <a class="navbar-item" target="_blank" rel="noopener noreferrer" href="https://github.com/billiam-dev">
+                    <img class="navbar-image enlarge-on-hover" src="..\\assets/github_icon_white.png" alt="Github">
+                </a>
+                <a class="navbar-item" target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/william-barber-9a0841278/">
+                    <img class="navbar-image enlarge-on-hover" src="..\\assets/linkedin_icon_white.png" alt="LinkedIn">
+                </a>
+                <a class="navbar-item" target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/@BilliamDev">
+                    <img class="navbar-image enlarge-on-hover" src="..\\assets/youtube_icon_white.png" alt="Youtube">
+                </a>
+            </div>
+        </nav>
+        <section class="hero is-fullheight has-gradient-background below-navbar">
+            <div class="hero-body">
+                <div class="container has-gray-background has-drop-shadow has-border">
+                    <video class="has-border" src="..\\assets/projects/walls-that-watch/release_trailer.mov" autoplay muted playsinline loop></video>
+                    <div class="columns">
+                        <div class="column">
+                            <h1>Summary</h1>
+                            <p1>
+                                Walls that Watch is a challenging retro-horror game about escaping an enormous underground labyrinth filled with strange monsters.
+                                It took 14 months to develop, including levels, enemies, UI, models, textures and sounds effects, as well as writting the world and story of the game.
+                            </p1>
+                            <p>
+                                Since its release it has been played and recommended by several YouTubers and Steam curators and recieved very possitive reviews.
+                            </p1>
+                        </div>
+                        <div class="column is-one-half">
+                            <img class="has-border" src="..\\assets/projects/walls-that-watch/header.png">
+                        </div>
+                    </div>
+                    <div class="columns">
+                        <div class="column">
+                            <h1>Development</h1>
+                            <h2>Programming</h2>
+                            <p1>
+                                I intentionally designed Walls that Watch with a limitted in scope in mind, so that I could finish it relatively quickly. As such, I avoided any requirements of large, bespoke systems.
+                                The most challenging aspect of programming the game was bound to be the variety of diverse enemies, each with entirely different behaviours, visual elements and means of travel.
+                                For enemies that needed to physically traverse the world, I used Unity's NavMesh system.
+                                This involved figuring out how to partition the space so that some enemies avoid certain paths, such as those that intersect a light source or pool of water.
+                                <br><br>
+                                To handle enemy behaviours, I used a multi-layerd state maching.
+                                This manifested as a framework were each enemy inheritted from a base class which contained their current behaviour.
+                                This is an object which instructs the enemy on how to move, damage the player and when to switch behaviours using functions from the base class.
+                                it knows which of these options to perform because most of the enemy behaviours contatin a sub-state.
+                                For example, a simple roaming behaviour might look like this:
+                                <div class="columns">
+                                    <div class="column">
+                                        <pre><code class="has-border">public abstract class Enemy : MonoBehaviour
+{
+    EnemyBehaviour m_CurrentBehaviour;
+
+    protected void SwitchToBehaviour(EnemyBehaviour newBehaviour)
+    {
+        if (m_CurrentBehaviour != null)
+            m_CurrentBehaviour.End();
+
+        m_CurrentBehaviour = newBehaviour;
+        m_CurrentBehaviour.Start();
+    }
+
+    protected virtual void Update()
+    {
+        if (m_CurrentBehaviour != null)
+            m_CurrentBehaviour.Update();
+    }
+
+    abstract class EnemyBehaviour
+    {
+        Enemy enemy;
+
+        public EnemyBehaviour(Enemy enemy)
+        {
+            this.enemy = enemy;
+        }
+
+        // Event Hooks
+        protected abstract void OnStart();
+        protected abstract void OnUpdate();
+        protected abstract void OnEnd();
+        protected abstract string GetDebugInfo();
+    }
+}</code></pre>
+                                    </div>
+                                    <div class="column">
+                                        <pre><code class="has-border">public class BasicEnemy : Enemy
+{
+    const float roamingWaitTime = 4.0f;
+
+    void Start() => SwitchToBehaviour(new RoamingBehaviour());
+
+    class RoamingBehaviour : EnemyBehaviour
+    {
+        enum Substate
+        {
+            MovingToDestination,
+            Waiting
+        }
+
+        Substate substate;
+        float startedWaitTimestamp;
+
+        protected override void OnStart()
+        {
+            substate = Substate.MovingToDestination;
+            enemy.SetMoveDestination(GetRandomPointOnNavMesh());
+        }
+
+        protected override void OnUpdate()
+        {
+            switch (substate)
+            {
+                case Substate.MovingToDestination:
+                    if (enemy.HasReachedMoveDestination())
+                    {
+                        startedWaitTimestamp = Time.time;
+                        substate = Substate.Waiting;
+                    }
+                    break;
+
+                case Substate.Waiting:
+                    if (Time.time >= startedWaitTimestamp + enemy.roamingWaitTime)
+                        substate = Substate.MovingToDestination;
+                    break;
+            }
+        }
+    }
+}</code></pre>
+                                    </div>
+                                </div>
+                                This approach was perfect for building a small number of extremely unique enemies as quickly as possible.
+                                <br><br>
+                                Most of the level behaviours are controlled by a system of triggers.
+                                At the beginning of each level, a trigger fires to check whether the challenge mode is enabled and, if it is, the environment is modified and the correct exit trigger is selected.
+
+                                I later reformed this idea into a single EventTrigger component which contails a list of conditions and outputs.
+                                These elements are user-defined by inheriting from the coresponding base class, at which point all children are found using reflection and made available to the GUI.
+                                Then they can be added to an EventTrigger in the scene.
+                            </p1>
+                        </div>
+                    </div>
+                    <div class="columns">
+                        <div class="column">
+                            <h2>Modelling</h2>
+                            <p1>
+                                One of the greatest challenges I faced when developing WtW was spending hours of time slamming my head against the Blender default cube waiting for it to turn into art.
+                                3D modelling is a steep learning curve, especially for someone who isn't an artist. As such, the early models I produced for the game were extremely rudimentary and took a long time to make.
+                                Level assets needed to be modular and reusable, while enemies needed to have rigs so they could move.
+                                Luckily, there exists an artstyle where this jankyness is a feature, not a bug and I picked that one.
+                                <br><br>
+                                Through making WtW, I was able to develop my 3D modelling skills and have since began using the low-poly / high-poly workflow in my newer models, and texturing them in Substance Painter.
+                                With these skills I released a post-launch update to polish many of the older models, though I still held to the game's their retro aesthetic.
+                            </p1>
+                        </div>
+                        <div class="column">
+                            <div class="container">
+                                <figure>
+                                    <img class="has-border enlarge-on-hover" src="..\\assets/projects/walls-that-watch/mask_model.png">
+                                    <img class="has-border enlarge-on-hover" src="..\\assets/projects/walls-that-watch/wall_monster_model.png">
+                                    <figcaption class="has-text-centered">Old / new enemy model examples</figcaption>
+                                </figure>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="columns">
+                        <div class="column">
+                            <h2>Level Design</h2>
+                            <p>
+                                Equally tedious was level design.
+                                Every WtW level went through at least three complete do-overs, graphically and topographically.
+                                The size of the levels had to be just small enough for players to stumble upon their objectives, but just large enough to create dynamic encounters with the various monsters.
+                                A big problem the game faced during development was that players would get lost on the last power box, struggle for ages until their power went out and they had to start over.
+                                I combatted this with two changes:
+                                <ul>
+                                    <li>
+                                        I introduced a proximity alert to the radar; which beeps faster the closer you are to an objective.
+                                    </li>
+                                    <li>
+                                        I researched real-life interior design and implemented a hub-and-spokes system in each level.
+                                    </li>
+                                </ul>
+                                The goal of the hub-and-spokes layout is to create recognisable zones that players will naturally return to.
+                                At that point they can look at the remaining corridors and make an intentional decision on where to explore next.
+                                The best players combined their navigation with their radar, and were able to tell which room was ahead just by using its distinct shape.
+                            </p1>
+                        </div>
+                    </div>
+                    <div class="columns">
+                        <div class="column">
+                            <img class="has-border" src="..\\assets/projects/walls-that-watch/artstyle_old.png">
+                        </div>
+                        <div class="column">
+                            <img class="has-border" src="..\\assets/projects/walls-that-watch/artsyle_new.png">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </section>
+        <footer id="footer">
+        </footer>
+    </body>
+</html>
