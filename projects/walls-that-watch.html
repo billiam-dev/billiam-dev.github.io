@@ -75,21 +75,21 @@
                                     <div class="column">
                                         <pre><code class="has-border">public abstract class Enemy : MonoBehaviour
 {
-    EnemyBehaviour m_CurrentBehaviour;
+    EnemyBehaviour currentBehaviour;
 
     protected void SwitchToBehaviour(EnemyBehaviour newBehaviour)
     {
-        if (m_CurrentBehaviour != null)
-            m_CurrentBehaviour.End();
+        if (currentBehaviour != null)
+            currentBehaviour.End();
 
-        m_CurrentBehaviour = newBehaviour;
-        m_CurrentBehaviour.Start();
+        currentBehaviour = newBehaviour;
+        currentBehaviour.Start();
     }
 
     protected virtual void Update()
     {
-        if (m_CurrentBehaviour != null)
-            m_CurrentBehaviour.Update();
+        if (currentBehaviour != null)
+            currentBehaviour.Update();
     }
 
     abstract class EnemyBehaviour
