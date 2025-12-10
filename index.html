@@ -5,7 +5,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="shortcut icon" href="assets/billiam_logo.png">
         <link rel="apple-touch-icon" href="assets/billiam_logo.png">
-        <link rel="stylesheet" href="assets/style.css">
+        <link rel="stylesheet" href="assets/style/main.css">
+        <link rel="stylesheet" href="assets/style/index.css">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
@@ -13,10 +14,9 @@
         <title>Billiam</title>
     </head>
     <body>
+        <!-- Navbar -->
         <nav class="navbar" id="navbar">
-            <div class="navbar-items">
-                <img class="navbar-logo" src="assets/billiam_logo_full.png">
-            </div>
+            <img class="navbar-logo" src="assets/billiam_logo_full.png">
             <div class="navbar-items">
                 <a class="navbar-item" href="#home">Home</a>
                 <a class="navbar-item" href="#about">About</a>
@@ -34,26 +34,26 @@
                 </a>
             </div>
         </nav>
+        <!-- Fullscreen Video Hero -->
         <section class="hero is-fullheight has-gradient-background" id="home">
             <video class="fullscreen-video" src="assets/projects/walls-that-watch/release_trailer.mov" autoplay muted playsinline loop></video>
             <div class="hero-body">
                 <div class="container">
-                    <h1 class="has-big-font">Behold, my stuff!</h1>
-                    <hr class="styled-hr">
+                    <h1 class="title has-text-centered">Behold, my stuff!</h1>
+                    <hr>
                 </div>
             </div>
         </section>
+        <!-- About Section -->
         <section class="hero is-halfheight has-gray-background has-text-centered" id="about">
             <div class="hero-body">
                 <div class="container">
                     <div class="columns">
-                        <div class="column is-one-fifth">
-                            <figure class="image small is-centred">
-                                <img src="assets/me.png" alt="The absolute mug in question">
-                            </figure>
+                        <div class="column">
+                            <img class="image" src="assets/me.png" alt="The absolute mug in question">
                         </div>
                         <div class="column has-text-left">
-                            <h1>About</h1>
+                            <h1 class="hide-on-mobile">About</h1>
                             <hr>
                             <p>
                                 Hi, my name is Billy, I'm a 22 year old games programmer from England.
@@ -67,6 +67,7 @@
                 </div>
             </div>
         </section>
+        <!-- Project Showcase Section -->
         <section class="hero is-halfheight" id="showcase">
             <div class="hero-body">
                 <div class="container">
@@ -74,62 +75,50 @@
                         <h1>Showcase</h1>
                         <hr>
                     </div>
-                    <div class="columns">
-                        <div class="column is-one-third">
+                    <div class="columns is-multiline">
+                        <div class="column">
                             <div class="project-card has-gray-background has-drop-shadow has-border enlarge-on-hover">
                                 <a class="hide-link" href="projects/procedural-terrain.html">
                                     <img class="has-border" src="assets/projects/terrain-generator/card-temp.png">
                                     <div class="project-card-content">
                                         <h1>Procedural Terrain</h1>
                                         <hr>
-                                        <p class="truncated-description">
-                                            Optimized marching cubes terrain generator.
-                                        </p>
-                                        <div class="date-range">
-                                            <p>Sep 2025...</p>
-                                        </div>
+                                        <p>Optimized marching cubes terrain generator.</p>
+                                        <p class="date-range">Sep 2025...</p>
                                     </div>
                                 </a>
                             </div>
                         </div>
-                        <div class="column is-one-third">
+                        <div class="column">
                             <div class="project-card has-gray-background has-drop-shadow has-border enlarge-on-hover">
                                 <a class="hide-link" href="projects/water-system.html">
-                                    <img class="has-border" src="assets/projects/water-system/card-temp.png">
+                                    <img class="has-border" src="assets/projects/water-system/card.png">
                                     <div class="project-card-content">
                                         <h1>Water System</h1>
                                         <hr>
-                                        <p class="truncated-description">
-                                            Surface and underwater ocean renderer.
-                                        </p>
-                                        <div class="date-range">
-                                            <p>July 2025...</p>
-                                        </div>
+                                        <p>Optimized surface and underwater ocean renderer for Unity URP.</p>
+                                        <p class="date-range">July 2025...</p>
                                     </div>
                                 </a>
                             </div>
                         </div>
-                        <div class="column is-one-third">
+                        <div class="column">
                             <div class="project-card has-gray-background has-drop-shadow has-border enlarge-on-hover">
                                 <a class="hide-link" href="projects/walls-that-watch.html">
                                     <img class="has-border" src="assets/projects/walls-that-watch/card.png">
                                     <div class="project-card-content">
                                         <h1>Walls that Watch</h1>
                                         <hr>
-                                        <p class="truncated-description">
-                                            Indie retro-horror game about escaping a labyrinth of monsters with a radar.
-                                        </p>
-                                        <div class="date-range">
-                                            <p>Mar 2024 - June 2025</p>
-                                        </div>
+                                        <p>Indie retro-horror game about escaping a labyrinth of monsters with a radar.</p>
+                                        <p class="date-range">Mar 2024 - June 2025</p>
                                     </div>
                                 </div>
                             </a>
                         </div>
                     </div>
-                    <div class="section justify-right">
-                        <div class="anchor-right">
-                            <a class="button hide-link has-gray-background has-drop-shadow has-border enlarge-on-hover" href="projects.html">
+                    <div class="section">
+                        <div class="button has-gray-background has-drop-shadow has-border enlarge-on-hover">
+                            <a class="hide-link" href="projects.html">
                                 <h1>See all...</h1>
                             </a>
                         </div>
@@ -138,7 +127,7 @@
             </div>
         </div>
         </section>
-        <footer id="footer">
-        </footer>
+        <!-- Footer -->
+        <footer id="footer"></footer>
     </body>
 </html>

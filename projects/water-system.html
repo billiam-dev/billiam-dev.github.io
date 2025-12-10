@@ -3,54 +3,51 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="shortcut icon" href="..\\assets/billiam_logo.png">
-        <link rel="apple-touch-icon" href="..\\assets/billiam_logo.png">
-        <link rel="stylesheet" href="..\\assets/style.css">
-        <link rel="stylesheet" href="..\\assets/highlight/atom-one-dark.css">
+        <link rel="shortcut icon" href="../assets/billiam_logo.png">
+        <link rel="apple-touch-icon" href="../assets/billiam_logo.png">
+        <link rel="stylesheet" href="../assets/style/main.css">
+        <link rel="stylesheet" href="../assets/style/article.css">
+        <link rel="stylesheet" href="../assets/highlight/atom-one-dark.css">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-        <script src="..\\assets/highlight/highlight.js"></script>
+        <script src="../assets/highlight/highlight.js"></script>
         <script>hljs.highlightAll();</script>
         <script>history.scrollRestoration = "manual"</script>
         <title>Billiam | Water System</title>
     </head>
     <body>
+        <!-- Navbar -->
         <nav class="navbar" id="navbar">
+            <img class="navbar-logo" src="../assets/billiam_logo_full.png">
             <div class="navbar-items">
-                <img class="navbar-logo" src="..\\assets/billiam_logo_full.png">
-            </div>
-            <div class="navbar-items">
-                <a class="navbar-item" href="..\\index.html#home">Home</a>
-                <a class="navbar-item" href="..\\index.html#about">About</a>
-                <a class="navbar-item" href="..\\index.html#showcase">Projects</a>
+                <a class="navbar-item" href="../index.html#home">Home</a>
+                <a class="navbar-item" href="../index.html#about">About</a>
+                <a class="navbar-item" href="../projects.html">Projects</a>
             </div>
             <div class="navbar-items aligned-right">
                 <a class="navbar-item" target="_blank" rel="noopener noreferrer" href="https://github.com/billiam-dev">
-                    <img class="navbar-image enlarge-on-hover" src="..\\assets/github_icon_white.png" alt="Github">
+                    <img class="navbar-image enlarge-on-hover" src="../assets/github_icon_white.png" alt="Github">
                 </a>
                 <a class="navbar-item" target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/william-barber-9a0841278/">
-                    <img class="navbar-image enlarge-on-hover" src="..\\assets/linkedin_icon_white.png" alt="LinkedIn">
+                    <img class="navbar-image enlarge-on-hover" src="../assets/linkedin_icon_white.png" alt="LinkedIn">
                 </a>
                 <a class="navbar-item" target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/@BilliamDev">
-                    <img class="navbar-image enlarge-on-hover" src="..\\assets/youtube_icon_white.png" alt="Youtube">
+                    <img class="navbar-image enlarge-on-hover" src="../assets/youtube_icon_white.png" alt="Youtube">
                 </a>
             </div>
         </nav>
+        <!-- Article -->
         <section class="hero is-fullheight has-gradient-background below-navbar">
             <div class="hero-body">
                 <div class="container has-gray-background has-drop-shadow has-border">
                     <div class="container">
                         <h2>Abstract</h2>
                         <p1>
-                            This is a (very) brief overview of my Water System for Unity, explaining how I made the Water System for my upcoming game Abyssal.
+                            This is a brief overview of my Water System for Unity, summarising the techniques used in making a convincing ocean simulation for real-time games.
                             As it turns out, building a convincing ocean system is an extremely complicated task, especially for someone who had never used hlsl, nor even heard of a compute shader.
-                            By far the most daunting task for me was working out where to even start with each individual component in the system.
-                            And that's not to say there aren't several more features that could be implemented.
-                            <br>
-                            If by chance you are reading this and looking to build your own water system, I've linked a bunch of resources which helped me with mine.
-                            <br>
-                            Also note that my implementation is still under development and some aspects are bound to change.
+                            By far the most daunting task for me was working out where to even start with each individual component in the system, and that's not to say there aren't several more features that could be implemented.
+                            If by chance you are reading this and looking to build your own water system, I've linked the resources I used throughout and at the bottom of the page.
                         </p1>
                         <h2>Sections</h2>
                         <ul>
@@ -114,7 +111,7 @@
     commandBuffer.Clear();
     CommandBufferPool.Release(commandBuffer);
 }</code></pre>
-                            The UpdateSurface() method is where I queue the necessary compute shaders and Scriptable Render Passes, as discussed later.
+                            The UpdateSurface() is used to queue compute shaders and Scriptable Render Passes; including the FFT, caustics, surface passes and underwater post processing.
                         </p1>
                     </div>
                     <div class="container">
@@ -122,79 +119,125 @@
                         <h2>Wave Displacement</h2>
                         <p1>
                             In my previous water shader mentioned above, I displaced the ocean vertices using the sum of four <a href="https://en.wikipedia.org/wiki/Trochoidal_wave">Gerstner Waves</a>, each with different amplitudes, frequencies and wavelengths.
-                            While this looked acceptable over small areas, observing the water from above or below gives immediatly shows noticeable repeating, or tiling, patterns.
-                            The obvious solution is to jsut add more waves, but modern PC's begin to struggle at even 64 Gerstner waves.
-                            To mimic real oceans, we need to simulate literal millions of waves at once.
-                            To do this, we can use the <i>Fast Fourier Transform</i>, the tech behind popular games such as Sea of Theives and Subnautica's ocean and the results speak for themselves...
+                            While this looked acceptable over a small area, observing the water from above or below gives rise to noticeable repeating, or tiling, patterns.
+                            This problem is visable in so many games' oceans, since we can't simply tell the GPU to render the millions of waveforms present in a real ocean without it totally exploding.
+                            So how do games like Sea of Thieves create their stunning wave visuals? The secret is the <i>Fast Fourier Transform</i>.
                         </p1>
                         <figure>
-                            <img class="has-border" src="..\\assets/projects/water-system/sea_of_thieves_ocean.webp">
+                            <img class="has-border" src="../assets/projects/water-system/sea_of_thieves_ocean.webp">
                             <figcaption>Sea of Thieves Ocean</figcaption>
                         </figure>
                         <p>
-                            The thesis of the Fourier Transform is that any given waveform can be represented as a sum of sinusoids, a fancy word which means basic sine and cosine waves.
-                            The purpose of Fourier Transform then, is to take a periodic waveform and decompose it into a sum of sinusoids that, depending on how many waves you want, very closesly matches it.
-                            <br>
-                            See: <a href="https://www.thefouriertransform.com/#introduction">https://www.thefouriertransform.com/#introduction</a>
+                            You might have already heard of the Fast Fourier Transform and it's uses in ocean rendering.
+                            It has been used in dozens of games and movies after it was proposed in the 2004 paper <a href="https://people.computing.clemson.edu/~jtessen/reports/papers_files/coursenotes2004.pdf">Simulating Ocean Water</a> by Jerry Tessendorf.
+                            I first learned of it from a source I am much more familiar with; Acerola's 2023 video <a href="https://www.youtube.com/watch?v=yPfagLeUa7k">I Tried Simulating The Entire Ocean</a>.
+                            Both were extremely useful in understanding the wave displacement and water shading techniques below.
                             <br><br>
-                            The output of the Fourier Transform can be considered as a wave graph in the frequency domain which, as opposed to describing how amplitude of a wave changes over time, describes how the amplitude of a wave changes with a range of frequencies.
-                            <br>
-                            For example, the frequency of these waves is ~30hz, so we see a spike at ~30hz in the frequency domain. The spike in the second graph is higher, to reflect the wave's increased amplitude.
+                            The thesis behind the Fourier Transform is that any periodic waveform can be built from a sum of sinusoids - sine and cosine waves.
+                            The purpose of Fourier Transform is to take a waveform and decompose it into that sum of sinusoids, see: <a href="https://www.thefouriertransform.com/#introduction">here</a> to learn more about the Fourier Transform.
+                            <br><br>
+                            It's output, then, can be viewed as a wave graph in the frequency domain which, as opposed to describing how amplitude of a wave changes over time, describes how the amplitude of a wave changes with a range of frequencies.
+                            For example, for a wave of frequency ~30hz, so would see a spike in the frequency domain at ~30hz. The size of the spike is proportional to it's amplitude, as we see in the figure below.
                             <figure class="image small">
-                                <img src="..\\assets/projects/water-system/time_domain_vs_frequency_domain.ppm">
-                                <figcaption>Time domain vs frequency domain, see: <a href="https://www.researchgate.net/figure/Time-domain-graph-and-frequency-domain-graph-Take-034-013-When-there-is-only_fig1_342559582">here</a></figcaption>
+                                <img src="../assets/projects/water-system/time_domain_vs_frequency_domain.ppm">
+                                <figcaption>Time domain vs frequency domain. Figure from <a href="https://www.researchgate.net/figure/Time-domain-graph-and-frequency-domain-graph-Take-034-013-When-there-is-only_fig1_342559582">here</a></figcaption>
                             </figure>
-                            The neat part is, the Fourier Transform can perform this in reverse too, known as the Inverse Fourier Transform.
-                            So, for a constantly progressing frequency spectrum, we shall perform the Inverse Fourier Transform over a set of discrete points to obtain usable displacement and slope values which can be applied in an ocean shader.
+                            The neat part is this operation is reversible, known as the Inverse Fourier Transform.
+                            Performing an IFT on a signal in the frequency domain converts it into a waveform in the time domain, which we can sample in our shader.
+                            To generate a wave spectra, we can actually use real-world wave data such as the Phillips spectrum, which is used by both HDRP and Sea of Theives.
+                            However, the developers behind <i>Atlas</i> in their 2021 GDC talk on water simulation recommends Duel fetch limited JONSWAP spectra for more artistic control over the waves.
+                            <br><br>
+                            Now to perform the IFT on our JONSWAP spectra, there are several algorithms we can choose from.
+                            We, of course, want to go with the fastest one available creatively known as the Fast Fourier Transform (FFT).
+                            The FFT uses a 'Butterfly Algorithm' to recursively split the wave data in half avoiding unnecessary calculations, see <a href="https://antoniospg.github.io/UnityOcean/OceanSimulation.html">here</a> for detail on the mathematics.
+                            <br><br>
+                            To summarise all of this stuff in a sentence: we generate and progress a frequency domain wave spectrum, then perform the IFT over a set of discrete points (texture coords) to attain usable displacement values for our shader.
+                            We can derrive a slope map for normal vectors from the displacement map, and the resulting textures look like this:
                         </p>
                         <div class="columns">
                             <div class="column">
                                 <figure class="image tiny">
-                                    <img src="..\\assets/projects/water-system/wave_displacement.gif">
+                                    <img src="../assets/projects/water-system/wave_displacement.gif">
                                     <figcaption>Displacement Map</figcaption>
                                 </figure>
                             </div>
                             <div class="column">
                                 <figure class="image tiny">
-                                <img src="..\\assets/projects/water-system/wave_slope.gif">
+                                <img src="../assets/projects/water-system/wave_slope.gif">
                                     <figcaption>Slope Map</figcaption>
                                 </figure>
                             </div>
                         </div>
                         <p>
-                            A basic implementation of this algorithm is known as the Discrete Fourier Transform, but this alone does not meet the performance requirements of real-time games, which is why we use the Fast Fourier Transform.
-                            This uses an algorithm knows as the 'Butterfly Algorithm' to recursively split the data in half avoiding unnecessary calculations.
-                            See <a href="https://antoniospg.github.io/UnityOcean/OceanSimulation.html">the section on FFT</a> for more details.
-                            <br>
-                            With this frankly insane performance, we can compute several unique wave spectrums simultaneously and tile them over the ocean.
-                            This practically eliminates tiling by stretching it over a truly colossal area:
-                            <img class="has-border" src="..\\assets/projects/water-system/ocean_sunset.png">
-                            TEMP!!
+                            However, even with very detailed wave spectra, we have not completely erradicated tiling.
+                            So, we actually compute several wave spectra simultaneously and scale them differently over the ocean surface.
+                            The idea is to distort the details of each spectrum by the other spectra, reducing the "same-y-ness" of tiling artefacts.
                         </p>
+                        <img class="has-border" src="../assets/projects/water-system/fft_waves.png">
+                        <p>
+                            Last in this section is a few additional notes I came across along the way:
+                            <br>
+                            You change the resolution of your FFTs at runtime by defining several kernals constant data like this...
+                        </p>
+                            <pre><code class="has-border">#pragma kernel RowPass_128    FFTPass=RowPass_128                 FFT_RESOLUTION=128    BUTTERFLY_COUNT=7
+#pragma kernel ColPass_128    FFTPass=ColPass_128   COLUMN_PASS   FFT_RESOLUTION=128    BUTTERFLY_COUNT=7
+#pragma kernel RowPass_256    FFTPass=RowPass_256                 FFT_RESOLUTION=256    BUTTERFLY_COUNT=8
+#pragma kernel ColPass_256    FFTPass=ColPass_256   COLUMN_PASS   FFT_RESOLUTION=256    BUTTERFLY_COUNT=8
+#pragma kernel RowPass_512    FFTPass=RowPass_512                 FFT_RESOLUTION=512    BUTTERFLY_COUNT=9
+#pragma kernel ColPass_512    FFTPass=ColPass_512   COLUMN_PASS   FFT_RESOLUTION=512    BUTTERFLY_COUNT=9
+
+[numthreads(FFT_RESOLUTION, 1, 1)]
+void FFTPass(uint3 id : SV_DISPATCHTHREADID)
+{
+    for (int i = 0; i < 8; i++)
+    {
+        #ifdef COLUMN_PASS
+            _FourierTarget[uint3(id.xy, i)] = FFT(id.x, _FourierTarget[uint3(id.xy, i)]);
+        #else
+            _FourierTarget[uint3(id.yx, i)] = FFT(id.x, _FourierTarget[uint3(id.yx, i)]);
+        #endif
+    }
+}</code></pre>
+                    <p>
+                        And it is likely have to employ one or several techniques to decrease the large-scale tiling into the horizen.
+                        Approaches I have seen include:
+                    </p>
+                    <ul>
+                        <li>Attenuating the displacement and normal maps with distance.</li>
+                        <li>Computing a dozen or so FFT's for varying frequency bands and attenuating high frequencies with distance.</li>
+                        <li>Decreasing the uv tiling with LOD bands, with blending.</li>
+                    </ul>
                     </div>
                     <div class="container">
                         <a class="anchor" id="water-shading"></a>
                         <h2>Water Shading</h2>
                         <p1>
-
+                            Time to make the surface look like a huge body of water.
+                            For this, we need to simulate how light interacts with a translucent surface, meaning some light is absorbed, some is scattered and some is reflected.
+                            <br>
+                            ...
+                            <br>
+                            This is all sourced from a GDC talk on Atlas' water rendering, see <a href="https://www.youtube.com/watch?v=Dqld965-Vv0">here</a>.
                         </p1>
                     </div>
                     <div class="container">
                         <a class="anchor" id="dynamic-detail"></a>
                         <h2>Dynamic Detail</h2>
                         <p1>
-                            *Pictures above should show non-infinite centre mesh.<br>
-                            Now we have a decent looking water surface, we need to turn it into an unending ocean.
-                            However, simply tiling these grid meshes quickly explodes the vertex count. We could decrease the resolution of the grid mesh but now the waves are jagged, as there is not enough vertices to accurately reflect the water surface.
-                            To solve this problem, we must reduce the detail of the mesh as it gets further from the camera, where the pixels on your screen cannot depict the detail anyway.
+                            Now we are computing wave simulation and ocean lighting, we need to render it as a collosal ocean surface.
+                            So far, I have used a limited size grid mesh.
+                            Simply rendering more of these is a waste of resources since the mesh does not account for the camera's perspective, which cannot perceive nearly as much detail as the geometry gets further into the skyline.
+                            So I employ two methods to give the mesh extremely high detail close to the camera and extremely low detail far away.
                             To achieve this, I used two techniques:
                             <ul>
-                                <li>Dynamic Meshing</li>
+                                <li>Mesh Generation</li>
                                 <li>Vertex Tessellation</li>
                             </ul>
                         </p1>
                         <p>
-                            TODO: Talk about integrating DrawMeshInstancedIndirect with Vertex Tessellation. Important in this article to write integration tips that I couldn't find on the internet.
+                            TODO: Talk about integrating DrawMeshInstancedIndirect with Vertex Tessellation.
+                            <br><br>
+                            The mesh shown above is 
                         </p>
                         <p>
                             Vertex Tessellation takes place inside the water surface shader, specifically in the Hull and Domain stages.
@@ -214,6 +257,7 @@
                         <h2>Underwater Rendering</h2>
                         <p1>
                             Did not have transparent depth prepass, so I had to do my own. Red/green face rendering etc...
+                            We also need to add a case in our surface rendering function to handle the backfaces (backface not a perfect representation but it's pretty good).
                         </p1>
                     </div>
                     <div class="container">
@@ -239,10 +283,10 @@
     return intialTriangleArea / refractedTriangleArea;
 }</code></pre>
                         <p1>
-                            And here is the texture produced:
+                            Which produces a texture like this:
                         </p1>
                         <figure class="image tiny">
-                            <img src="..\\assets/projects/water-system/caustics.gif">
+                            <img src="../assets/projects/water-system/caustics.gif">
                             <figcaption>Caustics Texture</figcaption>
                         </figure>
                         <p1>
@@ -279,7 +323,7 @@
                             This function is called from a ray-marching shader, including upsampling and Gausian blur, before being composited into the final image.
                         </p1>
                         <figure>
-                            <img class="has-border" src="..\\assets/projects/water-system/caustics-screenshot.png">
+                            <img class="has-border" src="../assets/projects/water-system/caustics_screenshot.png">
                         </figure>
                     </div>
                     <div class="container">
@@ -355,50 +399,39 @@ float SmallestPointDistanceToMesh(float3 pos)
                     This along with frustum culling and a capped render distance makes the performance hit much more managable.
                     </p>
                     </div>
-                    <div class="container">
+                    <div class="container" id="citations">
                         <a class="anchor" id="sources"></a>
                         <h2>Sources</h2>
 
                         <p>The Fourier Transform</p>
-                        <figcaption class="reference">
-                            <a href="https://www.thefouriertransform.com/">https://www.thefouriertransform.com/</a>
-                        </figcaption>
+                        <a class="reference" href="https://www.thefouriertransform.com/">https://www.thefouriertransform.com/</a>
 
-                        <p>Physically based Water Shading</p>
-                        <figcaption class="reference">
-                            <a href="https://www.scratchapixel.com/lessons/3d-basic-rendering/introduction-to-shading/reflection-refraction-fresnel.html">https://www.scratchapixel.com/lessons/3d-basic-rendering/introduction-to-shading/reflection-refraction-fresnel.html</a>
-                        </figcaption>
+                        <p>Wakes, Explosions and Lighting: Interactive Water Simulation in Atlas</p>
+                        <a href="https://www.youtube.com/watch?v=Dqld965-Vv0">https://www.youtube.com/watch?v=Dqld965-Vv0</a>
 
-                        <p>I Tried Simulating The Entire Ocean - Acerola</p>
-                        <figcaption class="reference">
-                            <a href="https://www.youtube.com/watch?v=yPfagLeUa7k">https://www.youtube.com/watch?v=yPfagLeUa7k</a>
-                        </figcaption>
+                        <p>Reflection, Refraction and Fresnel</p>
+                        <a class="reference" href="https://www.scratchapixel.com/lessons/3d-basic-rendering/introduction-to-shading/reflection-refraction-fresnel.html">https://www.scratchapixel.com/lessons/3d-basic-rendering/introduction-to-shading/reflection-refraction-fresnel.html</a>
 
                         <p>Ocean Simulation - antoniospg</p>
-                        <figcaption class="reference">
-                            <a href="https://antoniospg.github.io/UnityOcean/OceanSimulation.html">https://antoniospg.github.io/UnityOcean/OceanSimulation.html</a>
-                        </figcaption>
+                        <a class="reference" href="https://antoniospg.github.io/UnityOcean/OceanSimulation.html">https://antoniospg.github.io/UnityOcean/OceanSimulation.html</a>
 
                         <p>Simulating Ocean Water - Jerry Tessendorf</p>
-                        <figcaption class="reference">
-                            <a href="https://people.computing.clemson.edu/~jtessen/reports/papers_files/coursenotes2004.pdf">https://people.computing.clemson.edu/~jtessen/reports/papers_files/coursenotes2004.pdf</a>
-                        </figcaption>
+                        <a class="reference" href="https://people.computing.clemson.edu/~jtessen/reports/papers_files/coursenotes2004.pdf">https://people.computing.clemson.edu/~jtessen/reports/papers_files/coursenotes2004.pdf</a>
+
+                        <p>I Tried Simulating The Entire Ocean - Acerola</p>
+                        <a class="reference" href="https://www.youtube.com/watch?v=yPfagLeUa7k">https://www.youtube.com/watch?v=yPfagLeUa7k</a>
 
                         <p>Rendering Realtime Caustics in WebGL - Even Wallace</p>
-                        <figcaption class="reference">
-                            <a href="https://medium.com/@evanwallace/rendering-realtime-caustics-in-webgl-2a99a29a0b2c">https://medium.com/@evanwallace/rendering-realtime-caustics-in-webgl-2a99a29a0b2c</a>
-                        </figcaption>
+                        <a class="reference" href="https://medium.com/@evanwallace/rendering-realtime-caustics-in-webgl-2a99a29a0b2c">https://medium.com/@evanwallace/rendering-realtime-caustics-in-webgl-2a99a29a0b2c</a>
 
                         <p>Periodic Caustic Textures</p>
-                        <figcaption class="reference">
-                            <a href="https://www.dgp.toronto.edu/public_user/stam/reality/Research/PeriodicCaustics/index.html">https://www.dgp.toronto.edu/public_user/stam/reality/Research/PeriodicCaustics/index.html</a>
-                        </figcaption>
+                        <a class="reference" href="https://www.dgp.toronto.edu/public_user/stam/reality/Research/PeriodicCaustics/index.html">https://www.dgp.toronto.edu/public_user/stam/reality/Research/PeriodicCaustics/index.html</a>
                     </div>
                 </div>
             </div>
         </div>
         </section>
-        <footer id="footer">
-        </footer>
+        <!-- Article -->
+        <footer id="footer"></footer>
     </body>
 </html>

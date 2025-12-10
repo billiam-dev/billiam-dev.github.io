@@ -1,0 +1,44 @@
+/* About */
+#about .column{
+    margin: auto;
+}
+
+#about .image {
+    max-width: 14vmax;
+    margin: auto;
+}
+
+@media screen and (max-width: 600px) {
+    #about p{
+        text-align: center;
+    }
+
+    #about .image {
+        max-width: 24vmax;
+        margin: auto;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    #about .columns{
+        flex-wrap: wrap;
+    }
+}
+
+/* Showcase */
+@media screen and (max-width: 600px) {
+    #showcase h1{
+        text-align: center;
+    }
+
+    #showcase p{
+        text-align: center;
+    }
+}
+
+@media screen and (min-width: 992px) {
+    #showcase .column{
+        flex: none;
+        width: 32%;
+    }
+}

@@ -3,47 +3,48 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="shortcut icon" href="..\\assets/billiam_logo.png">
-        <link rel="apple-touch-icon" href="..\\assets/billiam_logo.png">
-        <link rel="stylesheet" href="..\\assets/style.css">
-        <link rel="stylesheet" href="..\\assets/highlight/atom-one-dark.css">
+        <link rel="shortcut icon" href="../assets/billiam_logo.png">
+        <link rel="apple-touch-icon" href="../assets/billiam_logo.png">
+        <link rel="stylesheet" href="../assets/style/main.css">
+        <link rel="stylesheet" href="../assets/style/article.css">
+        <link rel="stylesheet" href="../assets/highlight/atom-one-dark.css">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-        <script src="..\\assets/highlight/highlight.js"></script>
+        <script src="../assets/highlight/highlight.js"></script>
         <script>hljs.highlightAll();</script>
         <script>history.scrollRestoration = "manual"</script>
         <title>Billiam | Walls that Watch</title>
     </head>
     <body>
+        <!-- Navbar -->
         <nav class="navbar" id="navbar">
+            <img class="navbar-logo" src="../assets/billiam_logo_full.png">
             <div class="navbar-items">
-                <img class="navbar-logo" src="..\\assets/billiam_logo_full.png">
-            </div>
-            <div class="navbar-items">
-                <a class="navbar-item" href="..\\index.html#home">Home</a>
-                <a class="navbar-item" href="..\\index.html#about">About</a>
-                <a class="navbar-item" href="..\\index.html#showcase">Projects</a>
+                <a class="navbar-item" href="../index.html#home">Home</a>
+                <a class="navbar-item" href="../index.html#about">About</a>
+                <a class="navbar-item" href="../projects.html">Projects</a>
             </div>
             <div class="navbar-items aligned-right">
                 <a class="navbar-item" target="_blank" rel="noopener noreferrer" href="https://github.com/billiam-dev">
-                    <img class="navbar-image enlarge-on-hover" src="..\\assets/github_icon_white.png" alt="Github">
+                    <img class="navbar-image enlarge-on-hover" src="../assets/github_icon_white.png" alt="Github">
                 </a>
                 <a class="navbar-item" target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/william-barber-9a0841278/">
-                    <img class="navbar-image enlarge-on-hover" src="..\\assets/linkedin_icon_white.png" alt="LinkedIn">
+                    <img class="navbar-image enlarge-on-hover" src="../assets/linkedin_icon_white.png" alt="LinkedIn">
                 </a>
                 <a class="navbar-item" target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/@BilliamDev">
-                    <img class="navbar-image enlarge-on-hover" src="..\\assets/youtube_icon_white.png" alt="Youtube">
+                    <img class="navbar-image enlarge-on-hover" src="../assets/youtube_icon_white.png" alt="Youtube">
                 </a>
             </div>
         </nav>
+        <!-- Article -->
         <section class="hero is-fullheight has-gradient-background below-navbar">
             <div class="hero-body">
                 <div class="container has-gray-background has-drop-shadow has-border">
-                    <video class="has-border" src="..\\assets/projects/walls-that-watch/release_trailer.mov" autoplay muted playsinline loop></video>
+                    <video class="has-border" src="../assets/projects/walls-that-watch/release_trailer.mov" autoplay muted playsinline loop></video>
                     <div class="columns">
                         <div class="column">
-                            <h1>Summary</h1>
+                            <h1>Overview</h1>
                             <p1>
                                 Walls that Watch is a challenging retro-horror game about escaping an enormous underground labyrinth filled with strange monsters.
                                 It took 14 months to develop, including levels, enemies, UI, models, textures and sounds effects, as well as writing the world and story of the game.
@@ -52,28 +53,26 @@
                                 Since its release it has been played and recommended by several YouTubers and Steam curators and received very positive reviews.
                             </p1>
                         </div>
-                        <div class="column is-one-half">
-                            <img class="has-border" src="..\\assets/projects/walls-that-watch/header.png">
+                        <div class="column is-one-half hide-on-mobile">
+                            <img class="has-border hide" src="../assets/projects/walls-that-watch/header.png">
                         </div>
                     </div>
-                    <div class="columns">
-                        <div class="column">
-                            <h1>Development</h1>
-                            <h2>Programming</h2>
-                            <p1>
-                                I intentionally designed Walls that Watch with a limited in scope in mind, so that I could finish it relatively quickly. As such, I avoided any requirements of large, bespoke systems.
-                                The most challenging aspect of programming the game was bound to be the variety of diverse enemies, each with entirely different behaviours, visual elements and means of travel.
-                                For enemies that needed to physically traverse the world, I used Unity's NavMesh system.
-                                This involved figuring out how to partition the space so that some enemies avoid certain paths, such as those that intersect a light source or pool of water.
-                                <br><br>
-                                To handle enemy behaviours, I used a multi-layered state machine.
-                                This manifested as a framework were each enemy inherited from a base class which contained their current behaviour.
-                                This is an object which instructs the enemy on how to move, damage the player and when to switch behaviours using functions from the base class.
-                                it knows which of these options to perform because most of the enemy behaviours contain a sub-state.
-                                For example, a simple roaming behaviour might look like this:
-                                <div class="columns">
-                                    <div class="column">
-                                        <pre><code class="has-border">public abstract class Enemy : MonoBehaviour
+                    <h1>Development</h1>
+                    <h2>Programming</h2>
+                    <p1>
+                        I intentionally designed Walls that Watch with a limited in scope in mind, so that I could finish it relatively quickly. As such, I avoided any requirements of large, bespoke systems.
+                        The most challenging aspect of programming the game was bound to be the variety of diverse enemies, each with entirely different behaviours, visual elements and means of travel.
+                        For enemies that needed to physically traverse the world, I used Unity's NavMesh system.
+                        This involved figuring out how to partition the space so that some enemies avoid certain paths, such as those that intersect a light source or pool of water.
+                        <br><br>
+                        To handle enemy behaviours, I used a multi-layered state machine.
+                        This manifested as a framework were each enemy inherited from a base class which contained their current behaviour.
+                        This is an object which instructs the enemy on how to move, damage the player and when to switch behaviours using functions from the base class.
+                        it knows which of these options to perform because most of the enemy behaviours contain a sub-state.
+                        For example, a simple roaming behaviour might look like this:
+                        <div class="columns is-multiline">
+                            <div class="column">
+                                <pre><code class="has-border">public abstract class Enemy : MonoBehaviour
 {
     EnemyBehaviour currentBehaviour;
 
@@ -153,22 +152,20 @@
         }
     }
 }</code></pre>
-                                    </div>
-                                </div>
-                                This approach was perfect for building a small number of extremely unique enemies as quickly as possible.
-                                <br><br>
-                                Most of the level behaviours are controlled by a system of triggers.
-                                At the beginning of each level, a trigger fires to check whether the challenge mode is enabled and, if it is, the environment is modified and the correct exit trigger is selected.
-
-                                I later reformed this idea into a single EventTrigger component which contains a list of conditions and outputs.
-                                These elements are user-defined by inheriting from the corresponding base class, at which point all children are found using reflection and made available to the GUI.
-                                Then they can be added to an EventTrigger in the scene.
-                            </p1>
+                            </div>
                         </div>
-                    </div>
+                        This approach was perfect for building a small number of extremely unique enemies as quickly as possible.
+                        <br><br>
+                        Most of the level behaviours are controlled by a system of triggers.
+                        At the beginning of each level, a trigger fires to check whether the challenge mode is enabled and, if it is, the environment is modified and the correct exit trigger is selected.
+
+                        I later reformed this idea into a single EventTrigger component which contains a list of conditions and outputs.
+                        These elements are user-defined by inheriting from the corresponding base class, at which point all children are found using reflection and made available to the GUI.
+                        Then they can be added to an EventTrigger in the scene.
+                    </p1>
+                    <h2>Modelling</h2>
                     <div class="columns">
                         <div class="column">
-                            <h2>Modelling</h2>
                             <p1>
                                 One of the greatest challenges I faced when developing WtW was spending hours of time slamming my head against the Blender default cube waiting for it to turn into art.
                                 3D modelling is a steep learning curve, especially for someone who isn't an artist. As such, the early models I produced for the game were extremely rudimentary and took a long time to make.
@@ -182,16 +179,16 @@
                         <div class="column">
                             <div class="container">
                                 <figure>
-                                    <img class="has-border enlarge-on-hover" src="..\\assets/projects/walls-that-watch/mask_model.png">
-                                    <img class="has-border enlarge-on-hover" src="..\\assets/projects/walls-that-watch/wall_monster_model.png">
+                                    <img class="has-border" src="../assets/projects/walls-that-watch/mask_model.png">
+                                    <img class="has-border" src="../assets/projects/walls-that-watch/wall_monster_model.png">
                                     <figcaption class="has-text-centered">Old / new enemy model examples</figcaption>
                                 </figure>
                             </div>
                         </div>
                     </div>
+                    <h2>Level Design</h2>
                     <div class="columns">
                         <div class="column">
-                            <h2>Level Design</h2>
                             <p>
                                 Equally tedious was level design.
                                 Every WtW level went through at least three complete do-overs, graphically and topographically.
@@ -214,17 +211,17 @@
                     </div>
                     <div class="columns">
                         <div class="column">
-                            <img class="has-border" src="..\\assets/projects/walls-that-watch/artstyle_old.png">
+                            <img class="has-border" src="../assets/projects/walls-that-watch/artstyle_old.png">
                         </div>
                         <div class="column">
-                            <img class="has-border" src="..\\assets/projects/walls-that-watch/artsyle_new.png">
+                            <img class="has-border" src="../assets/projects/walls-that-watch/artsyle_new.png">
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         </section>
-        <footer id="footer">
-        </footer>
+        <!-- Footer -->
+        <footer id="footer"></footer>
     </body>
 </html>
