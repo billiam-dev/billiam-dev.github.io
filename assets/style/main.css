@@ -116,7 +116,6 @@ footer{
     object-fit: cover;
     z-index: -1;
     opacity: 1;
-    filter: blur(0.1rem)
 }
 
 /* Navbar TODO: mobile burger */
