@@ -92,7 +92,6 @@
                         </div>
                         <p1>
                             ...and the equivalent C#.
-                        </p1>
                         <pre><code class="has-border">Vector3 GerstnerDisplacement(Vector3 pos, Vector3 direction, float amplitude, float phase, float timescale, float offset, float gravity, float depth)
 {
     float period = offset * timescale;
@@ -135,8 +134,7 @@ float HyperbolicTangent(double a)
 {
     return (float)System.Math.Tanh(a);
 }</code></pre>
-                        <p1>
-                            For each buoyant object, we work out the distance under the wave height every phyisics tick and then apply an upwards force proportional to that distance.
+                            For each buoyant object, I compute the distance under the wave height every phyisics tick and then apply an upwards force proportional to that distance.
                             Note that because Gerster waves displace horizontally as well as vertically, the y component of the displacement vector is not perfectly accurate to the provided x and y position.
                             In my case this was not noticeable in the final product, however you can attain a more accurate result by subtracting the x and z offsets from the original position and then doing the Gerstner computation again.
                             Somewhere around four itteration of this gives a very accurate aproximation.

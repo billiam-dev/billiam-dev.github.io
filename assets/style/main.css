@@ -118,6 +118,19 @@ footer{
     opacity: 1;
 }
 
+.video-button{
+    position: absolute;
+    z-index: 10;
+    opacity: 0.5;
+    right: 1rem;
+    top: 1rem;
+    max-width: 4vmax;
+}
+
+.video-button:hover{
+    opacity: 1;
+}
+
 /* Navbar TODO: mobile burger */
 .navbar{
     background-color: #fc3b11;
@@ -224,7 +237,6 @@ footer{
     flex-grow: 1;
     flex-shrink: 0;
 }
-
 
 @media screen and (max-width: 600px) {
     .hero-body{
