@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="shortcut icon" href="../assets/billiam_logo.png">
+        <link rel="apple-touch-icon" href="../assets/billiam_logo.png">
+        <link rel="stylesheet" href="../assets/style/main.css">
+        <link rel="stylesheet" href="../assets/style/article.css">
+        <link rel="stylesheet" href="../assets/highlight/atom-one-dark.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+        <script src="../assets/highlight/highlight.js"></script>
+        <script>hljs.highlightAll();</script>
+        <title>Billiam | Terrain System</title>
+    </head>
+    <body>
+        <!-- Navbar -->
+        <nav class="navbar" id="navbar">
+            <img class="navbar-logo" src="../assets/billiam_logo_full.png">
+            <div class="navbar-items">
+                <a class="navbar-item" href="../index.html#home">Home</a>
+                <a class="navbar-item" href="../index.html#about">About</a>
+                <a class="navbar-item" href="../index.html#projects">Projects</a>
+            </div>
+            <div class="navbar-items aligned-right">
+                <a class="navbar-item" target="_blank" rel="noopener noreferrer" href="https://github.com/billiam-dev">
+                    <img class="navbar-image enlarge-on-hover" src="../assets/github_icon_white.png" alt="Github">
+                </a>
+                <a class="navbar-item" target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/william-barber-9a0841278/">
+                    <img class="navbar-image enlarge-on-hover" src="../assets/linkedin_icon_white.png" alt="LinkedIn">
+                </a>
+                <a class="navbar-item" target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/@BilliamDev">
+                    <img class="navbar-image enlarge-on-hover" src="../assets/youtube_icon_white.png" alt="Youtube">
+                </a>
+            </div>
+        </nav>
+        <!-- Article -->
+        <section class="hero is-fullheight has-gradient-background below-navbar">
+            <div class="hero-body">
+                <div class="container has-gray-background has-drop-shadow has-border">
+                    <div class="container">
+                        <!-- Overview -->
+                        <h1>Overview</h1>
+                        <p1>
+                            This project was my attempt at an infinite terrain generator in Unity.
+                            It uses a modified Marching Cubes algorithm to generate meshes from an underlying Signed Distance Field model comprised of several layers of noise and, optionally, user-defined shapes.
+                            The inspiration for this project came from the game Deep Rock Galactic, which boasts one of the best cave generators in gaming.
+                            I was inspired to attempt a similar sort of cave generator to learn more about computer graphics and improve my low-level abilities.
+                        </p1>
+                        <h2>Sections</h2>
+                        <ul>
+                            <li>
+                                <a class="hide-link" href="#isosurface_meshing">Isosurface Meshing</a>
+                            </li>
+                            <li>
+                                <a class="hide-link" href="#sdfs">Signed Distance Functions</a>
+                            </li>
+                            <li>
+                                <a class="hide-link" href="#unity_jobs">JOBS & Compute Shaders</a>
+                            </li>
+                            <li>
+                                <a class="hide-link" href="#chunking">Chunking</a>
+                            </li>
+                            <li>
+                                <a class="hide-link" href="#transvoxel">Transvoxel</a>
+                            </li>
+                            <li>
+                                <a class="hide-link" href="#sources">Sources</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- Isosurface Meshing -->
+                    <div class="container">
+                        <a class="anchor" id="isosurface_meshing"></a>
+                        <h2>Isosurface Meshing</h2>
+                        <p1>
+                            My first goal for this project was to be able to mesh a small region of space defined by some mathematical function.
+                            I knew this could be achieved with the rather well-known 'Marching Cubes' algorithm, a method of isosurface extraction from an underlying density field.
+                            <br>
+                            What follows is a brief explanation of Marching Cubes so the later sections make sense, so if you already know how it works just skip forward :)
+                            <br><br>
+                            Meshing an isosurface with the Marching Cubes algorithm is dead simple.
+                            The isosurface is a three dimentional grid of discrete points, each with some value representing the distance from the terrain surface at that point - this value will be refered to as density.
+                            The point grid can be treated as cells, or voxels, each consisting of 8 points each.
+                            These cells are given to the marching cubes algorithm and it processes each independently, in sequence or in parallel.
+                            First, the marching cubes algorithm evalues the density value at each cell corner to see if it greater or less than zero.
+                            Density values greater than zero will be inside the mesh, density values less than zero are outsite and exactly zero is on the surface.
+                            The combination of the resulting boolean values result in a unique 'case code' for each cell, up to 256.
+                            This case code is fed into an enormous 'triangulation' table, which tells the mesher which edges it needs to connect into triangles to correctly mesh the surface.
+<pre><code class="has-border">int3[] cornerOffsets =
+{
+    (0, 0, 0), // 0       6--------7
+    (1, 0, 0), // 1      /|       /|
+    (0, 1, 0), // 2     / |      / |
+    (1, 1, 0), // 3    4--------5  |
+    (0, 0, 1), // 4    |  2-----|--3
+    (1, 0, 1), // 5    | /      | /
+    (0, 1, 1), // 6    |/       |/
+    (1, 1, 1)  // 7    0--------1
+};
+
+byte caseCode = 0;
+for (uint i = 0; i < 8; i++)
+{
+    int3 coordinate = cellIndex + cornerOffsets[i];
+    if (SampleDensity(coordinate) > 0)
+        caseCode |= (1 << i);
+}</code></pre>
+                        <br><br>
+                        With this basic marching cubes implementation, I could generate shapes by implementing the SampleDensity() function as something like:
+                        <pre><code class="has-border">d = length(coordinate) - radius;</code></pre>
+                        giving this result:
+                        <figure class="image small">
+                                <img class="has-border" src="../assets/projects/terrain-generator/sphere.png">
+                                <figcaption>Sphere.</figcaption>
+                            </figure>
+                        </p1>
+                    </div>
+                    <!-- Signed Distance Functions -->
+                    <div class="container">
+                        <a class="anchor" id="sdfs"></a>
+                        <h2>Signed Distance Functions</h2>
+                        <p1>
+                            Now able to mesh a simple isosurface, I decided to model some slightly more complex surfaces.
+                            I mentioned above that the 'density' value used by the Marching Cubes algorithm represents the distance from that point to the nearest surface.
+                            Fields with this property are known as Signed Distance Fields and are generally generated by combining Signed Distance Functions (SDFs), mathematical formulas representing shapes.
+                            The function above is the SDF for a sphere, which I found on Inigo Quilez's website <a href="https://iquilezles.org/articles/distfunctions/">here</a>, the de facto SDF bible.
+                            Following <a href="https://developer.nvidia.com/gpugems/gpugems3/part-i-geometry/chapter-1-generating-complex-procedural-terrains-using-gpu">this</a> artical on NVIDIA gems, I was able to model a plane with this simple SDF...
+                            <pre><code class="has-border">d = -coordinate.y;</code></pre>
+                            and combine them with a SmoothMin function like this one, also from Inigo Quilez...
+                            <pre><code class="has-border">// Cubic polynomial smin
+float SmoothMin(float a, float b, float k)
+{
+    k *= 6.0f;
+    float h = max(k - abs(a - b), 0.0f ) / k;
+    return min(a, b) - h * h * h * k * (1.0f / 6.0f);
+}</code></pre>
+                            to produce this result:
+                            <figure class="image small">
+                                <img class="has-border" src="../assets/projects/terrain-generator/sphere-and-plane.png">
+                                <figcaption>Sphere and Plane combined with SmoothMin function.</figcaption>
+                            </figure>
+
+                            <!--Talk about sdfs, the NVIDIA paper for terrain surface generation, noise layers and caves.-->
+                        </p1>
+                    </div>
+                    <!-- JOBS & Compute Shaders -->
+                    <div class="container">
+                        <a class="anchor" id="unity_jobs"></a>
+                        <h2>JOBS & Compute Shaders</h2>
+                        <p1>
+                            To turn my Marching Cubes demo into a full terrain system, I had to make use of parallel processing to mesh the required massive spaces in real-time.
+                            After writing versions of the mesher to run on the GPU as a compute shader and Unity JOSB, I decided this terrain system would use JOBS.
+                            <br>
+                            This was for two main reasons:
+                            <br>
+                            - The GPU does not support dynamic memory allocation, meaning it must all be reserved on initialization.
+                            - Doing all the processing on the CPU avoids the need for large GPU readbacks for collision data.
+                            <br><br>
+                            I ended up converting my Marching Cubes and SDF algorithms into JOBS, and optimized them to the best of my ability.
+                            One interseting optimization was to use SIMD and branchless execution where possible, <a href="https://eetumaenpaa.fi/blog/marching-cubes-optimizations-in-unity/#voxelcorners-vs-stackalloc">this</a> article was a big help with that.
+                        </p1>
+                    </div>
+                    <!-- Chunking -->
+                    <div class="container">
+                        <a class="anchor" id="chunking"></a>
+                        <h2>Chunking</h2>
+                        <p1>
+                            TODO : Ocrees & Brickmaps
+                        </p1>
+                    </div>
+                    <!-- Transvoxel -->
+                    <div class="container">
+                        <a class="anchor" id="transvoxel"></a>
+                        <h2>Chunking</h2>
+                        <p1>
+                            TODO : Modified Marching Cubes + Transvoxel
+                        </p1>
+                    </div>
+                    <!-- Sources -->
+                    <div class="container">
+                        <a class="anchor" id="sources"></a>
+                        <h2>Sources</h2>
+
+                        <p>Coding Adventure: Marching Cubes</p>
+                        <a class="reference" href="https://www.youtube.com/watch?v=M3iI2l0ltbE">https://www.youtube.com/watch?v=M3iI2l0ltbE</a>
+
+                        <p>GPU Gems 3 - Generating Complex Procedural Terrains Using the GPU</p>
+                        <a class="reference" href="https://developer.nvidia.com/gpugems/gpugems3/part-i-geometry/chapter-1-generating-complex-procedural-terrains-using-gpu">https://developer.nvidia.com/gpugems/gpugems3/part-i-geometry/chapter-1-generating-complex-procedural-terrains-using-gpu</a>
+                        
+                        <p>Inigo Quilez</p>
+                        <a class="reference" href="https://iquilezles.org/">https://iquilezles.org/</a>
+
+                        <p>Marching Cubes optimizations in Unity</p>
+                        <a class="reference" href="https://eetumaenpaa.fi/blog/marching-cubes-optimizations-in-unity/#voxelcorners-vs-stackalloc">https://eetumaenpaa.fi/blog/marching-cubes-optimizations-in-unity/#voxelcorners-vs-stackalloc</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Footer -->
+        <footer id="footer"></footer>
+    </body>
+</html>
