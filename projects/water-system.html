@@ -22,7 +22,7 @@
             <div class="navbar-items">
                 <a class="navbar-item" href="../index.html#home">Home</a>
                 <a class="navbar-item" href="../index.html#about">About</a>
-                <a class="navbar-item" href="../projects.html">Projects</a>
+                <a class="navbar-item" href="../index.html#projects">Projects</a>
             </div>
             <div class="navbar-items aligned-right">
                 <a class="navbar-item" target="_blank" rel="noopener noreferrer" href="https://github.com/billiam-dev">
@@ -42,9 +42,10 @@
                 <div class="container has-gray-background has-drop-shadow has-border">
                     <video class="has-border" src="../assets/projects/water-system/surface_full.mov" autoplay muted playsinline loop></video>
                     <div class="container">
-                        <h2>Abstract</h2>
+                        <!-- Overview -->
+                        <h2>Overview</h2>
                         <p1>
-                            This is an overview of my Water System for Unity, summarising the techniques I used to try and replicate a convincing ocean for use in my own games.
+                            This is an overview of my Water System for Unity, summarising the techniques I used to try and create a fully-featured, realistic ocean for use in my own games.
                             As it turns out, oceans in games are extremely complex and multifaceted systems with strict performance requirements.
                             Note that my resources are linked throughout and at the bottom of the page.
                         </p1>
@@ -79,6 +80,7 @@
                             </li>
                         </ul>
                     </div>
+                    <!-- Setup -->
                     <div class="container">
                         <a class="anchor" id="setup"></a>
                         <h2>Setup</h2>
@@ -190,6 +192,7 @@ void FFTPass(uint3 id : SV_DISPATCHTHREADID)
     }
 }</code></pre>
                     </div>
+                    <!-- Water Shading -->
                     <div class="container">
                         <a class="anchor" id="water-shading"></a>
                         <h2>Water Shading</h2>
@@ -247,6 +250,7 @@ void FFTPass(uint3 id : SV_DISPATCHTHREADID)
                             </div>
                         </div>
                     </div>
+                    <!-- Dyanmic Detail -->
                     <div class="container">
                         <a class="anchor" id="dynamic-detail"></a>
                         <h2>Dynamic Detail</h2>
@@ -289,6 +293,7 @@ void FFTPass(uint3 id : SV_DISPATCHTHREADID)
                             Utilizing these methods allows the water to be depicted in extreme detail near the camera, while keeping the number of vertices sent to the GPU at just under 17k.
                         </p>
                     </div>
+                    <!-- Underwater Rendering -->
                     <div class="container">
                         <a class="anchor" id="underwater"></a>
                         <h2>Underwater Rendering</h2>
@@ -335,6 +340,7 @@ void FFTPass(uint3 id : SV_DISPATCHTHREADID)
                             Finally with that done, I simply tint the screen with an underwater absorption color using the combined water and scene depth.
                         </p1>
                     </div>
+                    <!-- Caustics -->
                     <div class="container">
                         <a class="anchor" id="caustics"></a>
                         <h2 id="caustics">Caustics</h2>
@@ -367,6 +373,7 @@ void FFTPass(uint3 id : SV_DISPATCHTHREADID)
                             Since the FFT produces periodic textures, the caustics can be seamlessly tiled across the environment using a global uv system such as triplanar mapping.
                         </p1>
                     </div>
+                    <!-- Godrays -->
                     <div class="container">
                         <a class="anchor" id="godrays"></a>
                         <h2>Godrays</h2>
@@ -395,6 +402,7 @@ void FFTPass(uint3 id : SV_DISPATCHTHREADID)
                             </figure>
                         </p1>
                     </div>
+                    <!-- Water Cutouts -->
                     <div class="container">
                         <a class="anchor" id="cutouts"></a>
                         <h2>Water Cutouts</h2>
@@ -461,7 +469,8 @@ float SmallestPointDistanceToMesh(float3 pos)
                     Cutout instances are also frustum culled to avoid evaluating out-of-view cutouts.
                     </p>
                     </div>
-                    <div class="container" id="citations">
+                    <!-- Sources -->
+                    <div class="container">
                         <a class="anchor" id="sources"></a>
                         <h2>Sources</h2>
 
