@@ -330,14 +330,13 @@ void FFTPass(uint3 id : SV_DISPATCHTHREADID)
     float3 skyboxPos = ComputeWorldSpacePosition(uv, 0.00001, UNITY_MATRIX_I_VP); // Tiny epsilon to remove line artefact created just under water plane.
     return surfaceMask > 0 || (_SurfacePosition.y > skyboxPos.y);
 }</code></pre>
-                            Note that even though branches are disadvised in GPU programs, returning a bool here means I can skip the expensive ray-marching steps mentioned later.
-                            <br><br>
-                            I'm honestly not entirely satisfied with this solution. While it is far more performant than the orthographic camera method and can handle submarines, it does have issues.
+                            <!--Note that even though branches are disadvised in GPU programs, returning a bool here means I can skip the expensive ray-marching steps mentioned later.-->
+                            While this solution is far more performant than the orthographic camera method and can handle submarines, it does have a few issues that I'd like to address later.
                             Most prominent is that violent waves can actually loop back around on themselved which creates backfaces above the water surface. These backfaces are improperly rendered as underwater.
                             The last approach I have considered is using some sort of vertical smearing to propagate the lowest water surface pixels on the screen downwards.
                             This would be performed in a compute shader after the depth pre-pass has been rasterized and, combined with the position mask, would create a perfect waterline so I may revisit this section later.
                             <br><br>
-                            Finally with that done, I simply tint the screen with an underwater absorption color using the combined water and scene depth.
+                            Finally with that done, I use the combined scene and water-surface depth textures to apply an absorption colour.
                         </p1>
                     </div>
                     <!-- Caustics -->
@@ -355,7 +354,7 @@ void FFTPass(uint3 id : SV_DISPATCHTHREADID)
                             <br><br>
                             <a href="https://medium.com/@evanwallace/rendering-realtime-caustics-in-webgl-2a99a29a0b2c">This</a> article by Evan Wallace describes how this can be done by constructing a dense 'virtual plane' and refracting the vertices as if travelling through water.
                             The new and old vertex positions are then ran through a ray, plane intersection function and given to the fragment shader.
-                            The color of each fragment is then determined by the difference in area between the non-refracted plane and the refracted one, taking advantage of the fact that fragments are computed in sets of four.
+                            The colour of each fragment is then determined by the difference in area between the non-refracted plane and the refracted one, taking advantage of the fact that fragments are computed in sets of four.
                             In Unity that looks like this:
                             <pre><code class="has-border">float Frag (Varyings i) : SV_Target
 {
